@@ -12,8 +12,8 @@ public class OpenApiConfig {
     public OpenAPI mercadoOpenApi() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Mercado DSC API")
-                        .description("API para cadastro, login e gerenciamento de perfil de usuarios.")
+                        .title("NEXUS HUB API")
+                        .description("API da plataforma academica gamificada NEXUS HUB.")
                         .version("v1"));
     }
 }

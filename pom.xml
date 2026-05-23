@@ -12,11 +12,11 @@
     </parent>
 
     <groupId>br.ufpb.dsc</groupId>
-    <artifactId>mercado</artifactId>
+    <artifactId>nexus-hub</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>mercado</name>
-    <description>Projeto base DSC - UFPB Campus IV</description>
+    <name>NEXUS HUB</name>
+    <description>Plataforma academica gamificada para centralizar projetos, grupos, eventos e oportunidades.</description>
 
     <properties>
         <java.version>21</java.version>
