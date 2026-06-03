@@ -16,6 +16,6 @@ Configure os secrets em `Settings -> Secrets and variables -> Actions -> New rep
 
 O workflow `.github/workflows/deploy.yml` cria/atualiza o `.env` no servidor durante o deploy usando esses secrets.
 
-## Imagem publica
+## Imagem no GHCR
 
-Depois do primeiro push da imagem, torne o pacote publico no GitHub Container Registry para que o servidor consiga fazer `docker compose pull` sem login no GHCR.
+O workflow faz login no GitHub Container Registry no servidor antes de executar `docker compose pull`, usando o token automatico do GitHub Actions. Por isso, o pacote nao precisa estar publico.
