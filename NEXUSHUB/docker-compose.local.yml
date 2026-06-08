@@ -39,7 +39,7 @@ services:
   frontend:
     image: nexushub-local-frontend
     build:
-      context: ./view-angular
+      context: ./view
       dockerfile: Dockerfile
     container_name: nexushub-local-frontend
     restart: unless-stopped

@@ -6,7 +6,7 @@ Esta estrutura segue MVC de forma explicita:
 
 - `model`: modulo Java com entidades, DTOs, repositorios e regras de negocio.
 - `controller`: modulo Spring Boot responsavel por expor a API REST.
-- `view`: aplicacao Next.js responsavel pela interface do usuario.
+- `view`: aplicacao Angular responsavel pela interface do usuario.
 
 ## Estrutura
 
@@ -77,7 +77,7 @@ Endpoints iniciais:
 - `GET /api/grupos`
 - `GET /api/oportunidades`
 
-## Frontend Next
+## Frontend Angular
 
 A interface fica em `view`.
 
@@ -86,12 +86,12 @@ Para rodar:
 ```bash
 cd view
 npm install
-npm run dev
+npm start
 ```
 
 URL local:
 
-- `http://localhost:3000`
+- `http://localhost:4200`
 
 ## Proposta do produto
 
