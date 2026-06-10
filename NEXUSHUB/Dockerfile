@@ -5,11 +5,11 @@ FROM node:20-alpine AS frontend-build
 
 WORKDIR /frontend
 
-COPY view-angular/package*.json ./
+COPY view/package*.json ./
 
 RUN npm install
 
-COPY view-angular/ .
+COPY view/ .
 
 RUN npm run build -- --configuration production
 
@@ -32,7 +32,7 @@ COPY controller ./controller
 RUN mkdir -p /app/controller/src/main/resources/static
 
 COPY --from=frontend-build \
-    /frontend/dist/view-angular/browser/ \
+    /frontend/dist/view/browser/ \
     /app/controller/src/main/resources/static/
 
 RUN mvn clean package -DskipTests
