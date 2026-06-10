@@ -20,54 +20,18 @@ O workflow `.github/workflows/deploy.yml` cria/atualiza o `.env` no servidor dur
 
 O build publica a imagem com `GITHUB_TOKEN`. A chave SSH possui um comando forcado no servidor e recebe `actor:GITHUB_TOKEN`, usando esse token efemero somente para autenticar no GHCR e baixar a imagem.
 
-## Reset do banco de producao sem dados reais
+## Reconstrucao controlada do banco
 
-Use este procedimento somente quando o banco de producao/homologacao nao tiver dados reais a preservar. Ele remove todas as tabelas do schema `public` e deixa o Flyway recriar o modelo atual a partir da migration `V1__init_schema.sql`.
+A chave SSH do servidor possui um comando forcado e aceita somente `actor:GITHUB_TOKEN`. Por isso, a pipeline nao pode executar comandos arbitrarios como `docker exec`, `docker restart` ou `curl`.
 
-### Pela pipeline
+A reconstrucao do banco sem dados reais e executada pelo Flyway:
 
-1. Abra `Actions -> Build & Deploy -> Run workflow`.
-2. Marque `Apagar e recriar o schema public antes do deploy`.
-3. Execute o workflow.
+- `V1__init_schema.sql` define a estrutura inicial;
+- `V2__rebuild_schema.sql` remove somente as tabelas da aplicacao;
+- a tabela `flyway_schema_history` e preservada;
+- a V2 recria a estrutura atual e e executada uma unica vez.
 
-O passo `Resetar banco de producao`:
-
-- envia `ops/reset-production-schema.sql` por SSH;
-- executa o SQL no container `postgres`, banco `eq01`, usuario `eq01`;
-- interrompe a pipeline se o reset falhar;
-- reinicia explicitamente o container `eq01-nexushub-backend`;
-- aguarda o health check `GET /ping`;
-- confirma a migration `V1` com sucesso e a existencia de `grp_group`;
-- exibe os ultimos logs do backend e falha a pipeline se a aplicacao nao subir.
-
-O deploy da imagem acontece antes do reset. Assim, a pipeline nao apaga o banco se a publicacao da nova versao falhar.
-
-O reset nao acontece em deploy automatico por `push`. Ele exige disparo manual com `reset_database` marcado.
-
-### Execucao manual no servidor
-
-1. Pare o backend antes do reset para evitar que a aplicacao tente validar o schema durante a limpeza.
-
-```bash
-docker compose stop backend
-```
-
-2. Conecte no PostgreSQL usado por `SPRING_DATASOURCE_URL` e execute o script operacional:
-
-```bash
-psql -U eq01 -d eq01 -f ops/reset-production-schema.sql
-```
-
-Se estiver executando dentro do container PostgreSQL, copie ou monte o arquivo antes, ou cole o conteudo de `ops/reset-production-schema.sql` no `psql`.
-
-3. Suba o backend novamente.
-
-```bash
-docker compose pull backend
-docker compose up -d backend
-```
-
-4. Valide que o Flyway recriou o schema e que o health check responde.
+Depois do deploy, valide no log do container que a migration V2 foi aplicada e que a aplicacao iniciou.
 
 ```sql
 SELECT installed_rank, version, description, success
@@ -75,19 +39,14 @@ FROM flyway_schema_history
 ORDER BY installed_rank;
 ```
 
-Resultado esperado:
+Resultado esperado no banco atualizado:
 
 ```text
-version: 1
-description: init schema
-success: true
+1 | 1 | init schema     | true
+2 | 2 | rebuild schema  | true
 ```
 
-```bash
-curl http://localhost:8101/ping
-```
-
-Resultado esperado:
+O health check deve responder:
 
 ```json
 {"status":"ok","service":"eq01","timestamp":"2026-06-03T14:32:10Z"}
