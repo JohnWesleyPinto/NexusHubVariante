@@ -5,9 +5,9 @@
 | **Data** | 2026-06-25 |
 | **Repositório** | https://github.com/des-sist-corp-ufpb/projeto-eq01 |
 | **Aplicação** | https://eq01.dsc.rodrigor.com |
-| **Período de atividade** | 2026-06-10 → 2026-06-10 |
-| **Total de commits** (sem merges) | 1 |
-| **Integrantes** | Kassio De Lima Leite (@KassioL2L) |
+| **Período de atividade** | 2026-06-10 → 2026-06-25 |
+| **Total de commits** (sem merges, branch main) | 2 |
+| **Integrantes** | Kassio De Lima Leite (@KassioL2L), John Wesley Da Silva Moreira Pinto (@JohnWesleyPinto) |
 
 ---
 
@@ -119,19 +119,25 @@
 
 ### Resumo
 
-| Usuário | Commits | % commits | Linhas adicionadas | Linhas no código atual | % código atual |
-|---------|---------|-----------|-------------------|----------------------|----------------|
-| Kassio De Lima Leite (@KassioL2L) | 1 | 100% | 32.678 | 10.074 | 100% |
+| Usuário | Commits (main) | Commits (GitHub API) | Linhas adicionadas | Linhas no código atual | % código atual |
+|---------|---------------|---------------------|-------------------|----------------------|----------------|
+| Kassio De Lima Leite (@KassioL2L) | 1 | **53** ⚠️ | 32.678 | 10.074 | 100% |
+| John Wesley Da Silva Moreira Pinto (@JohnWesleyPinto) | 0 | **2** | 0 | 0 | 0% |
+| *(sem login GitHub)* | 1 | 50% | — | — | — |
+
+> **⚠️ Divergência entre commits locais e GitHub API:**
+> - **@KassioL2L**: 1 commit(s) na branch `main` vs **53** registrados na API GitHub (commits em branches não mergeadas ou absorvidos via squash-merge sem preservação de autoria).
+>
 
 ### Contribuição por Camada
 
-| Camada | Total linhas | Kassio De Lima Leite (@KassioL2L) |
-|--------|-------------|---------|
-| Controller | 1.091 | 100% |
-| Frontend | 5.390 | 100% |
-| Repository | 281 | 100% |
-| Service | 1.091 | 100% |
-| Test | 23 | 100% |
+| Camada | Total linhas | Kassio De Lima Leite (@KassioL2L) | John Wesley Da Silva Moreira Pinto (@JohnWesleyPinto) |
+|--------|-------------|---------|---------|
+| Controller | 1.091 | 100% | 0% |
+| Frontend | 5.390 | 100% | 0% |
+| Repository | 281 | 100% | 0% |
+| Service | 1.091 | 100% | 0% |
+| Test | 23 | 100% | 0% |
 
 ---
 
@@ -139,38 +145,38 @@
 
 Baseado em `git blame` nos arquivos de controller e service.
 
-| Arquivo | Total linhas | Kassio De Lima Leite (@KassioL2L) |
-|---------|-------------|---------|
-| `V2__rebuild_schema.sql` | 288 | 100% |
-| `V1__init_schema.sql` | 273 | 100% |
-| `ProjectServiceImpl.java` | 268 | 100% |
-| `GroupServiceImpl.java` | 150 | 100% |
-| `IdentityServiceImpl.java` | 114 | 100% |
-| `DataSeeder.java` | 104 | 100% |
-| `auth.service.ts` | 94 | 100% |
-| `project.service.ts` | 81 | 100% |
-| `UsuarioRestController.java` | 72 | 100% |
-| `OpportunityServiceImpl.java` | 70 | 100% |
-| `ProjetoRestController.java` | 61 | 100% |
-| `HumanServiceImpl.java` | 56 | 100% |
-| `SolicitacaoRestController.java` | 55 | 100% |
-| `GrupoRestController.java` | 54 | 100% |
-| `OpportunityApplication.java` | 53 | 100% |
-| `grupo.service.ts` | 40 | 100% |
-| `ProjectService.java` | 38 | 100% |
-| `solicitacao.service.ts` | 36 | 100% |
-| `SecurityConfig.java` | 32 | 100% |
-| `OportunidadeRestController.java` | 28 | 100% |
-| `NexusHubApplication.java` | 28 | 100% |
-| `CorsConfig.java` | 25 | 100% |
-| `app.routes.ts` | 24 | 100% |
-| `GroupService.java` | 24 | 100% |
-| `ApiExceptionHandler.java` | 24 | 100% |
-| `HealthRestController.java` | 23 | 100% |
-| `IdentityService.java` | 22 | 100% |
-| `OpportunityApplicationRepository.java` | 16 | 100% |
-| `OpportunityService.java` | 15 | 100% |
-| `HumanService.java` | 14 | 100% |
+| Arquivo | Total linhas | Kassio De Lima Leite (@KassioL2L) | John Wesley Da Silva Moreira Pinto (@JohnWesleyPinto) |
+|---------|-------------|---------|---------|
+| `V2__rebuild_schema.sql` | 288 | 100% | 0% |
+| `V1__init_schema.sql` | 273 | 100% | 0% |
+| `ProjectServiceImpl.java` | 268 | 100% | 0% |
+| `GroupServiceImpl.java` | 150 | 100% | 0% |
+| `IdentityServiceImpl.java` | 114 | 100% | 0% |
+| `DataSeeder.java` | 104 | 100% | 0% |
+| `auth.service.ts` | 94 | 100% | 0% |
+| `project.service.ts` | 81 | 100% | 0% |
+| `UsuarioRestController.java` | 72 | 100% | 0% |
+| `OpportunityServiceImpl.java` | 70 | 100% | 0% |
+| `ProjetoRestController.java` | 61 | 100% | 0% |
+| `HumanServiceImpl.java` | 56 | 100% | 0% |
+| `SolicitacaoRestController.java` | 55 | 100% | 0% |
+| `GrupoRestController.java` | 54 | 100% | 0% |
+| `OpportunityApplication.java` | 53 | 100% | 0% |
+| `grupo.service.ts` | 40 | 100% | 0% |
+| `ProjectService.java` | 38 | 100% | 0% |
+| `solicitacao.service.ts` | 36 | 100% | 0% |
+| `SecurityConfig.java` | 32 | 100% | 0% |
+| `OportunidadeRestController.java` | 28 | 100% | 0% |
+| `NexusHubApplication.java` | 28 | 100% | 0% |
+| `CorsConfig.java` | 25 | 100% | 0% |
+| `app.routes.ts` | 24 | 100% | 0% |
+| `GroupService.java` | 24 | 100% | 0% |
+| `ApiExceptionHandler.java` | 24 | 100% | 0% |
+| `HealthRestController.java` | 23 | 100% | 0% |
+| `IdentityService.java` | 22 | 100% | 0% |
+| `OpportunityApplicationRepository.java` | 16 | 100% | 0% |
+| `OpportunityService.java` | 15 | 100% | 0% |
+| `HumanService.java` | 14 | 100% | 0% |
 
 ---
 
