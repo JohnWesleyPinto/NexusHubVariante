@@ -12,6 +12,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebSecurity
@@ -43,9 +45,12 @@ public class SecurityConfig {
                     .contentTypeOptions(Customizer.withDefaults())
                     .frameOptions(frame -> frame.deny()))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/health", "/actuator/health", "/api/usuarios/login",
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                .requestMatchers("/", "/index.html", "/ping", "/actuator/health", "/api/usuarios/login",
                         "/api/usuarios/cadastro", "/api/pagamentos/webhook",
                         "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/projetos/**", "/api/grupos/**",
+                        "/api/oportunidades/**").permitAll()
                 .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "SYSADMIN")
                 .anyRequest().authenticated()
             )
