@@ -185,7 +185,7 @@ export class GruposPageComponent implements OnInit {
       try {
         const parsed = JSON.parse(favsStr);
         return Array.isArray(parsed) && parsed.includes(id);
-      } catch (e) {
+      } catch {
         return false;
       }
     }
@@ -203,11 +203,16 @@ export class GruposPageComponent implements OnInit {
 
     const favsKey = `nexushub_fav_groups_${user.id}`;
     const favsStr = localStorage.getItem(favsKey);
-    let parsed = [];
+    let parsed: string[] = [];
     if (favsStr) {
       try {
-        parsed = JSON.parse(favsStr);
-      } catch (e) {}
+        const decoded = JSON.parse(favsStr);
+        if (Array.isArray(decoded)) {
+          parsed = decoded;
+        }
+      } catch {
+        parsed = [];
+      }
     }
     if (!Array.isArray(parsed)) parsed = [];
 

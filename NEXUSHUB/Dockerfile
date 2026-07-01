@@ -35,8 +35,7 @@ COPY --from=frontend-build \
     /frontend/dist/view/browser/ \
     /app/controller/src/main/resources/static/
 
-RUN --mount=type=cache,target=/root/.m2 \
-    set -e; \
+RUN set -e; \
     for attempt in 1 2 3; do \
       mvn --batch-mode --no-transfer-progress \
         -Dmaven.wagon.http.retryHandler.count=5 \
