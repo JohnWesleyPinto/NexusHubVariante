@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, catchError, of } from 'rxjs';
 import { apiUrl } from '../config/api.config';
 
 export interface UsuarioResponse {
@@ -45,27 +45,22 @@ export class AuthService {
   // Session Signal
   readonly currentUser = signal<UsuarioResponse | null>(null);
   readonly isLoggedIn = computed(() => this.currentUser() !== null);
+  readonly isAdmin = computed(() => ['ADMIN', 'SYSADMIN'].includes(this.currentUser()?.cargo ?? ''));
 
   constructor() {
     this.loadSession();
   }
 
   private loadSession() {
-    const session = localStorage.getItem('currentUser');
-    if (session) {
-      try {
-        this.currentUser.set(JSON.parse(session));
-      } catch {
-        localStorage.removeItem('currentUser');
-      }
-    }
+    this.http.get<UsuarioResponse>(`${this.apiUrl}/sessao`).pipe(
+      catchError(() => of(null))
+    ).subscribe(user => this.currentUser.set(user));
   }
 
   login(credentials: LoginRequest): Observable<UsuarioResponse> {
     return this.http.post<UsuarioResponse>(`${this.apiUrl}/login`, credentials).pipe(
       tap(user => {
         this.currentUser.set(user);
-        localStorage.setItem('currentUser', JSON.stringify(user));
       })
     );
   }
@@ -82,13 +77,12 @@ export class AuthService {
     return this.http.put<UsuarioResponse>(`${this.apiUrl}/perfil/${id}`, usuario).pipe(
       tap(updatedUser => {
         this.currentUser.set(updatedUser);
-        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
       })
     );
   }
 
   logout() {
     this.currentUser.set(null);
-    localStorage.removeItem('currentUser');
+    this.http.post<void>(`${this.apiUrl}/logout`, {}).subscribe();
   }
 }

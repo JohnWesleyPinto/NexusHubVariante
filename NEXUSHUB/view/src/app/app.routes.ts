@@ -8,6 +8,8 @@ import { ProjetoDetalhePageComponent } from './features/projects/pages/projeto-d
 import { GruposPageComponent } from './features/groups/pages/grupos/grupos.page';
 import { GrupoDetalhePageComponent } from './features/groups/pages/grupo-detalhe/grupo-detalhe.page';
 import { LojaPageComponent } from './features/store/pages/loja/loja.page';
+import { AdminPageComponent } from './features/administration/pages/admin/admin.page';
+import { PrivacyPageComponent } from './features/privacy/pages/privacy/privacy.page';
 
 export const routes: Routes = [
   { path: '', component: DashboardPageComponent },
@@ -19,6 +21,8 @@ export const routes: Routes = [
   { path: 'grupos', component: GruposPageComponent },
   { path: 'grupos/:id', component: GrupoDetalhePageComponent },
   { path: 'loja', component: LojaPageComponent },
+  { path: 'admin', component: AdminPageComponent },
+  { path: 'privacidade', component: PrivacyPageComponent },
   { path: '**', redirectTo: '' }
 ];
 

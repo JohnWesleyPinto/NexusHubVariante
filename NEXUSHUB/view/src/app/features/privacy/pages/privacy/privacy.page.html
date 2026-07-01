@@ -1,0 +1,5 @@
+<section class="privacy-page"><h2>Privacidade e LGPD</h2><p>Controle seus consentimentos e exerça seus direitos sobre dados pessoais.</p>
+ <div class="actions"><button class="btn btn-primary" (click)="consent(true)">Autorizar analytics</button><button class="btn btn-secondary" (click)="consent(false)">Revogar consentimento</button>
+ <button class="btn btn-secondary" (click)="export()">Exportar meus dados</button><button class="btn danger" (click)="anonymize()">Solicitar anonimização</button></div>
+ <p *ngIf="message()">{{message()}}</p><pre *ngIf="data()">{{data()|json}}</pre>
+</section>

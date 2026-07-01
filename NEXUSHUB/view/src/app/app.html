@@ -36,6 +36,8 @@
           <a routerLink="/perfil" routerLinkActive="active" class="nav-link" *ngIf="isLoggedIn()" (click)="closeMobileMenu()">
             Meu Perfil
           </a>
+          <a routerLink="/privacidade" routerLinkActive="active" class="nav-link" *ngIf="isLoggedIn()" (click)="closeMobileMenu()">Privacidade</a>
+          <a routerLink="/admin" routerLinkActive="active" class="nav-link" *ngIf="isAdmin()" (click)="closeMobileMenu()">Admin</a>
         </nav>
 
         <div class="header-actions">

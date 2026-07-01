@@ -19,4 +19,5 @@ public interface IdentityService {
     User updateUserProfile(UUID userId, String name, String email, String rawPassword);
 
     User firstUser();
+    User findByEmail(String email);
 }

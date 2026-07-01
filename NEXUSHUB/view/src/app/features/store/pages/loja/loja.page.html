@@ -1,3 +1,11 @@
 <section class="store-page animate-fade-in">
-  <app-store-coming-soon-card />
+  <header><span class="eyebrow">LOJA NEXUSHUB</span><h2>Apoie a comunidade acadêmica</h2><p>Pagamento seguro processado pelo Mercado Pago.</p></header>
+  <p class="notice" *ngIf="message()">{{ message() }}</p>
+  <div class="products">
+    <article class="product" *ngFor="let product of products()">
+      <h3>{{ product.name }}</h3><p>{{ product.description }}</p>
+      <strong>{{ product.price | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
+      <button class="btn btn-primary" [disabled]="loading()" (click)="buy(product)">Pagar com Mercado Pago</button>
+    </article>
+  </div>
 </section>

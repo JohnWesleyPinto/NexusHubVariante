@@ -79,6 +79,16 @@ public class User extends AuditableEntity implements Persistable<UUID> {
         this.lastAccessAt = LocalDateTime.now();
     }
 
+    public void changeRole(Role role, UUID updatedById) {
+        this.role = role;
+        touch(updatedById);
+    }
+
+    public void setActive(boolean active, UUID updatedById) {
+        this.recordStatus = active ? 1 : 0;
+        touch(updatedById);
+    }
+
     @Override
     public boolean isNew() {
         return !persisted;

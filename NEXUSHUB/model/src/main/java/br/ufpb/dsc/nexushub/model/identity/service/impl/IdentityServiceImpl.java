@@ -104,6 +104,13 @@ public class IdentityServiceImpl implements IdentityService {
                 .orElseThrow(() -> new IllegalStateException("Nenhum usuario auditor encontrado."));
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(normalizeEmail(email))
+                .orElseThrow(() -> new IllegalArgumentException("Usuario nao encontrado."));
+    }
+
     private String normalizeEmail(String email) {
         return email.trim().toLowerCase();
     }

@@ -20,6 +20,8 @@
         <spring-boot.version>3.4.5</spring-boot.version>
         <maven.compiler.release>${java.version}</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jacoco.version>0.8.13</jacoco.version>
+        <junit.version>5.12.2</junit.version>
     </properties>
 
     <dependencyManagement>
@@ -35,6 +37,53 @@
     </dependencyManagement>
 
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <goals><goal>prepare-agent</goal></goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals><goal>report</goal></goals>
+                    </execution>
+                    <execution>
+                        <id>coverage-check</id>
+                        <phase>verify</phase>
+                        <goals><goal>check</goal></goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.85</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                            <excludes>
+                                <exclude>**/domain/**</exclude>
+                                <exclude>**/dto/**</exclude>
+                                <exclude>**/*Application*</exclude>
+                                <exclude>**/config/**</exclude>
+                            </excludes>
+                            <includes>
+                                <include>br/ufpb/dsc/nexushub/model/administration/service/**</include>
+                                <include>br/ufpb/dsc/nexushub/model/privacy/service/**</include>
+                                <include>br/ufpb/dsc/nexushub/model/payments/service/**</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -44,6 +93,7 @@
                     <configuration>
                         <release>${java.version}</release>
                         <parameters>true</parameters>
+                        <proc>full</proc>
                     </configuration>
                 </plugin>
                 <plugin>

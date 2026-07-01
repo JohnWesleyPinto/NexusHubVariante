@@ -1,0 +1,49 @@
+name: Qualidade e segurança
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+  security-events: write
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: NEXUSHUB
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+      - name: Testes e cobertura mínima de 85%
+        run: mvn --batch-mode clean verify
+      - name: Dependency review
+        if: github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@v4
+      - name: OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: NexusHub
+          path: NEXUSHUB
+          format: HTML
+          args: --failOnCVSS 7
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: NEXUSHUB/view
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: NEXUSHUB/view/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test -- --watch=false
+      - run: npm audit --audit-level=high
+      - run: npm run build -- --configuration production

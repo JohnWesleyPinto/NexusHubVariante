@@ -15,6 +15,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -38,10 +44,25 @@ public class UsuarioRestController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         return identityService.authenticate(request.email(), request.senha())
-                .<ResponseEntity<?>>map(user -> ResponseEntity.ok(UsuarioResponse.from(user)))
+                .<ResponseEntity<?>>map(user -> {
+                    var authentication = new UsernamePasswordAuthenticationToken(
+                            user.getEmail(), null, java.util.List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName())));
+                    var context = SecurityContextHolder.createEmptyContext();
+                    context.setAuthentication(authentication);
+                    SecurityContextHolder.setContext(context);
+                    httpRequest.getSession(true).setAttribute(
+                            HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
+                    return ResponseEntity.ok(UsuarioResponse.from(user));
+                })
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorDto("E-mail ou senha incorretos.")));
+    }
+
+    @GetMapping("/sessao")
+    public ResponseEntity<?> sessao(java.security.Principal principal) {
+        if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        return ResponseEntity.ok(UsuarioResponse.from(identityService.findByEmail(principal.getName())));
     }
 
     @PostMapping("/esqueci-senha")

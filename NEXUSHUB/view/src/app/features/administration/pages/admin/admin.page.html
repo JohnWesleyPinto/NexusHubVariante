@@ -1,0 +1,5 @@
+<section class="admin-page"><h2>Administração</h2><p *ngIf="error()">{{error()}}</p>
+ <h3>Feature toggles</h3><div class="flags"><button *ngFor="let flag of flags()" (click)="toggle(flag)" [class.enabled]="flag.enabled">
+  <strong>{{flag.code}}</strong><span>{{flag.enabled?'Ligada':'Desligada'}}</span><small>{{flag.description}}</small></button></div>
+ <h3>Auditoria recente</h3><div class="table"><div class="row" *ngFor="let item of audits()"><strong>{{item.action}}</strong><span>{{item.entity}} {{item.entityId}}</span><time>{{item.createdAt|date:'short'}}</time></div></div>
+</section>

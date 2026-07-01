@@ -6,9 +6,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.core.userdetails.*;
+import br.ufpb.dsc.nexushub.model.identity.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -20,13 +23,34 @@ public class SecurityConfig {
     }
 
     @Bean
+    public UserDetailsService userDetailsService(UserRepository users) {
+        return email -> users.findByEmail(email.toLowerCase())
+                .map(user -> User.withUsername(user.getEmail())
+                        .password(user.getPasswordHash())
+                        .roles(user.getRole().getName())
+                        .disabled(user.getRecordStatus() == 0)
+                        .build())
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario nao encontrado."));
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .cors(Customizer.withDefaults())
-            .csrf(AbstractHttpConfigurer::disable)
+            .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                    .ignoringRequestMatchers("/api/pagamentos/webhook", "/api/usuarios/login", "/api/usuarios/cadastro"))
+            .headers(headers -> headers
+                    .contentTypeOptions(Customizer.withDefaults())
+                    .frameOptions(frame -> frame.deny()))
             .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll()
-            );
+                .requestMatchers("/api/health", "/actuator/health", "/api/usuarios/login",
+                        "/api/usuarios/cadastro", "/api/pagamentos/webhook",
+                        "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "SYSADMIN")
+                .anyRequest().authenticated()
+            )
+            .logout(logout -> logout.logoutUrl("/api/usuarios/logout").logoutSuccessHandler((req,res,auth)->res.setStatus(204)))
+            .sessionManagement(session -> session.sessionFixation(fix -> fix.migrateSession()));
         return http.build();
     }
 }

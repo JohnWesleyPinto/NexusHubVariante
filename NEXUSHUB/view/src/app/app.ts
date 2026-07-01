@@ -16,6 +16,7 @@ export class AppComponent implements OnInit {
 
   protected readonly isLoggedIn = computed(() => this.authService.isLoggedIn());
   protected readonly currentUser = computed(() => this.authService.currentUser());
+  protected readonly isAdmin = computed(() => this.authService.isAdmin());
   protected readonly isMobileMenuOpen = signal(false);
   protected readonly isDarkMode = signal(false);
 
