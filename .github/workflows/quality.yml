@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   backend:
-    runs-on: [self-hosted, dsc-selfhosted]
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: NEXUSHUB
@@ -50,7 +50,7 @@ jobs:
           if-no-files-found: ignore
 
   frontend:
-    runs-on: [self-hosted, dsc-selfhosted]
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: NEXUSHUB/view
@@ -70,7 +70,7 @@ jobs:
   codeql:
     name: CodeQL (${{ matrix.language }})
     if: vars.CODEQL_ENABLED == 'true'
-    runs-on: [self-hosted, dsc-selfhosted]
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
