@@ -27,7 +27,8 @@ public class ProjetoRestController {
     }
 
     @GetMapping
-    public List<ProjetoResponse> listar(@RequestParam(required = false) String tag, @RequestParam(required = false) String autor) {
+    public List<ProjetoResponse> listar(@RequestParam(required = false) String tag,
+            @RequestParam(required = false) String autor) {
         return projectService.listProjects(tag, autor).stream().map(ProjetoResponse::from).toList();
     }
 
@@ -57,5 +58,3 @@ public class ProjetoRestController {
         return ResponseEntity.ok(ProjetoResponse.from(projectService.getProject(id)));
     }
 }
-
-
