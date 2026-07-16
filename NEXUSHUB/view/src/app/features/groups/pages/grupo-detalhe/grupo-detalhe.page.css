@@ -1056,3 +1056,33 @@
       margin: 0;
     }
 
+    /* Forum Filters Styling */
+    .forum-filters-row {
+      display: flex;
+      margin-bottom: 20px;
+    }
+    .forum-filter-buttons {
+      display: flex;
+      gap: 8px;
+    }
+    .forum-filter-btn {
+      background: transparent;
+      border: 1px solid var(--color-border);
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--color-muted);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .forum-filter-btn:hover {
+      background: #f1f5f9;
+      color: var(--color-text);
+    }
+    .forum-filter-btn.active {
+      background: #3b82f6;
+      border-color: #3b82f6;
+      color: white;
+    }
+

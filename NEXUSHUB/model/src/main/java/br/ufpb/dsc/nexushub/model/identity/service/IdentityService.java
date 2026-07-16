@@ -18,7 +18,7 @@ public interface IdentityService {
 
     User updateUserProfile(UUID userId, String name, String email, String rawPassword, String fotoUrl);
 
-    User completeOnboarding(UUID userId, String nome, java.time.LocalDate birthDate, boolean showBirthday, String course, Integer period, String username);
+    User completeOnboarding(UUID userId, String nome, java.time.LocalDate birthDate, boolean showBirthday, String course, String period, String username);
 
     User updateFullProfile(UUID userId, br.ufpb.dsc.nexushub.model.dto.PerfilUpdateRequest request);
 

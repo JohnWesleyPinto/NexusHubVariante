@@ -92,7 +92,8 @@ export class CadastroPageComponent implements OnInit {
       nome: this.nome,
       email: this.email,
       senha: this.senha,
-      cargo: this.cargo
+      cargo: this.cargo,
+      lgpdConsent: this.lgpdConsent
     };
 
     this.authService.cadastrar(payload).subscribe({

@@ -23,7 +23,8 @@ export class OnboardingPageComponent {
   protected birthDate = '';
   protected showBirthday = true;
   protected course = '';
-  protected period: number | null = null;
+  protected period = '';
+  protected lgpdConsent = false;
 
   onSubmit() {
     const user = this.currentUser();
@@ -32,8 +33,8 @@ export class OnboardingPageComponent {
       return;
     }
 
-    if (!this.nome.trim() || !this.birthDate || !this.course.trim() || this.period === null) {
-      this.errorMessage.set('Por favor, preencha todos os campos obrigatórios.');
+    if (!this.nome.trim() || !this.birthDate || !this.course.trim() || !this.period.trim() || !this.lgpdConsent) {
+      this.errorMessage.set('Por favor, preencha todos os campos obrigatórios e aceite os termos.');
       return;
     }
 
@@ -45,7 +46,9 @@ export class OnboardingPageComponent {
       birthDate: this.birthDate, // expects yyyy-MM-dd
       showBirthday: this.showBirthday,
       course: this.course.trim(),
-      period: this.period ? Number(this.period) : null
+      period: this.period.trim(),
+      username: user.username || this.nome.trim().toLowerCase().replace(/\s+/g, '.'),
+      lgpdConsent: this.lgpdConsent
     };
 
     this.authService.completarOnboarding(user.id, payload).subscribe({

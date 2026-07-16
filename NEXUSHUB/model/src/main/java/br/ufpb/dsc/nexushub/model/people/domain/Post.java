@@ -44,20 +44,28 @@ public class Post extends AuditableEntity {
     @Column(name = "idgroup")
     private UUID groupId;
 
+    @Column(name = "idproject")
+    private UUID projectId;
+
     public Post(Human author, String content, String imageUrl, UUID updatedById) {
-        this(author, content, imageUrl, "USER", null, updatedById);
+        this(author, content, imageUrl, "USER", null, null, updatedById);
     }
 
     public Post(Human author, String content, String imageUrl, String postType, UUID updatedById) {
-        this(author, content, imageUrl, postType, null, updatedById);
+        this(author, content, imageUrl, postType, null, null, updatedById);
     }
 
     public Post(Human author, String content, String imageUrl, String postType, UUID groupId, UUID updatedById) {
+        this(author, content, imageUrl, postType, groupId, null, updatedById);
+    }
+
+    public Post(Human author, String content, String imageUrl, String postType, UUID groupId, UUID projectId, UUID updatedById) {
         this.author = author;
         this.content = content;
         this.imageUrl = imageUrl;
         this.postType = postType != null ? postType : "USER";
         this.groupId = groupId;
+        this.projectId = projectId;
         touch(updatedById);
     }
 }

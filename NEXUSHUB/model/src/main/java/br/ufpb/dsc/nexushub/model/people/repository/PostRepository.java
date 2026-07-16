@@ -13,4 +13,6 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
     List<Post> findAllByAuthorIdAndRecordStatusOrderByUpdatedAtDesc(UUID authorId, Integer recordStatus);
     List<Post> findAllByGroupIdAndRecordStatusOrderByUpdatedAtDesc(UUID groupId, Integer recordStatus);
     Page<Post> findAllByGroupIdAndRecordStatusOrderByUpdatedAtDesc(UUID groupId, Integer recordStatus, Pageable pageable);
+    List<Post> findAllByProjectIdAndRecordStatusOrderByUpdatedAtDesc(UUID projectId, Integer recordStatus);
+    Page<Post> findAllByProjectIdAndRecordStatusOrderByUpdatedAtDesc(UUID projectId, Integer recordStatus, Pageable pageable);
 }

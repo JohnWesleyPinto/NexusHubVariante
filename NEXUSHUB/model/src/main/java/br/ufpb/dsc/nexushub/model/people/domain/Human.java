@@ -44,7 +44,7 @@ public class Human extends AuditableEntity implements Persistable<UUID> {
     private String course;
 
     @Column(name = "nrperiod")
-    private Integer period;
+    private String period;
 
     @Column(name = "dtbirth")
     private LocalDate birthDate;
@@ -131,7 +131,7 @@ public class Human extends AuditableEntity implements Persistable<UUID> {
         touch(updatedById);
     }
 
-    public void updateProfile(String name, String email, String bio, String course, Integer period, UUID updatedById) {
+    public void updateProfile(String name, String email, String bio, String course, String period, UUID updatedById) {
         this.name = name;
         this.email = email;
         this.bio = bio;
@@ -152,7 +152,7 @@ public class Human extends AuditableEntity implements Persistable<UUID> {
         this.userType = userType;
     }
 
-    public void updateOnboarding(String name, LocalDate birthDate, boolean showBirthday, String course, Integer period, UUID updatedById) {
+    public void updateOnboarding(String name, LocalDate birthDate, boolean showBirthday, String course, String period, UUID updatedById) {
         this.name = name;
         this.birthDate = birthDate;
         this.showBirthday = showBirthday;

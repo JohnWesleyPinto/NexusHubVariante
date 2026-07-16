@@ -48,6 +48,19 @@ CREATE TABLE usr_humtech (
     CONSTRAINT fk_usr_humtech_updatedby FOREIGN KEY (idupdatedby) REFERENCES sec_user (iduser)
 );
 
+-- Seed dummy role, human, and user if not exists to satisfy not-null constraints during clean migrations
+INSERT INTO sec_role (idrole, nmrole, dsrole, tprole, strecord, idupdatedby, tsupdated)
+SELECT '00000000-0000-0000-0000-000000000000', 'SYSTEM_ADMIN', 'System Admin Role', 1, 1, '00000000-0000-0000-0000-000000000000', CURRENT_TIMESTAMP
+WHERE NOT EXISTS (SELECT 1 FROM sec_role);
+
+INSERT INTO usr_human (idhuman, nmhuman, dsemail, strecord, idupdatedby, tsupdated)
+SELECT '00000000-0000-0000-0000-000000000000', 'System', 'system@nexushub.com', 1, '00000000-0000-0000-0000-000000000000', CURRENT_TIMESTAMP
+WHERE NOT EXISTS (SELECT 1 FROM usr_human);
+
+INSERT INTO sec_user (iduser, idhuman, idrole, dsemail, dspasshash, strecord, idupdatedby, tsupdated)
+SELECT '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 'system@nexushub.com', 'dummy_hash', 1, '00000000-0000-0000-0000-000000000000', CURRENT_TIMESTAMP
+WHERE NOT EXISTS (SELECT 1 FROM sec_user);
+
 -- Seed standard technologies using a subquery to resolve updating user ID
 INSERT INTO usr_technology (nmtechnology, idupdatedby) VALUES 
 ('React', (SELECT iduser FROM sec_user LIMIT 1)),

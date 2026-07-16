@@ -39,6 +39,7 @@ public class UsuarioRestController {
     private final br.ufpb.dsc.nexushub.model.people.repository.TestimonialRepository testimonialRepository;
     private final br.ufpb.dsc.nexushub.model.people.repository.FollowRepository followRepository;
     private final br.ufpb.dsc.nexushub.model.people.repository.NotificationRepository notificationRepository;
+    private final br.ufpb.dsc.nexushub.model.privacy.service.PrivacyService privacyService;
     private final String googleClientId;
 
     public UsuarioRestController(IdentityService identityService, AuditService auditService, 
@@ -47,6 +48,7 @@ public class UsuarioRestController {
                                  br.ufpb.dsc.nexushub.model.people.repository.TestimonialRepository testimonialRepository,
                                  br.ufpb.dsc.nexushub.model.people.repository.FollowRepository followRepository,
                                  br.ufpb.dsc.nexushub.model.people.repository.NotificationRepository notificationRepository,
+                                 br.ufpb.dsc.nexushub.model.privacy.service.PrivacyService privacyService,
                                  @Value("${app.google.client-id}") String googleClientId) {
         this.identityService = identityService;
         this.auditService = auditService;
@@ -55,6 +57,7 @@ public class UsuarioRestController {
         this.testimonialRepository = testimonialRepository;
         this.followRepository = followRepository;
         this.notificationRepository = notificationRepository;
+        this.privacyService = privacyService;
         this.googleClientId = googleClientId;
     }
 
@@ -64,7 +67,11 @@ public class UsuarioRestController {
             if (request.senha() == null || request.senha().trim().length() < 6) {
                 throw new IllegalArgumentException("A senha deve ter pelo menos 6 caracteres.");
             }
+            if (request.lgpdConsent() == null || !request.lgpdConsent()) {
+                throw new IllegalArgumentException("O consentimento dos termos e LGPD é obrigatório.");
+            }
             User user = identityService.registerUser(request.nome(), request.email(), request.senha(), request.cargo(), request.fotoUrl());
+            privacyService.consent(user.getId(), "TERMS_AND_PRIVACY", "1.0", true);
             audit(user.getId(), "USER_REGISTERED", user.getId().toString(), "SUCCESS", httpRequest, "role=" + user.getRole().getName());
             return ResponseEntity.status(HttpStatus.CREATED).body(UsuarioResponse.from(user));
         } catch (IllegalArgumentException e) {
@@ -147,7 +154,11 @@ public class UsuarioRestController {
     public ResponseEntity<?> completarOnboarding(@PathVariable UUID id, @Valid @RequestBody OnboardingRequest request,
                                                  HttpServletRequest httpRequest) {
         try {
+            if (request.lgpdConsent() == null || !request.lgpdConsent()) {
+                throw new IllegalArgumentException("O consentimento dos termos e LGPD é obrigatório.");
+            }
             User user = identityService.completeOnboarding(id, request.nome(), request.birthDate(), request.showBirthday(), request.course(), request.period(), request.username());
+            privacyService.consent(user.getId(), "TERMS_AND_PRIVACY", "1.0", true);
             audit(id, "ONBOARDING_COMPLETED", id.toString(), "SUCCESS", httpRequest, null);
             return ResponseEntity.ok(UsuarioResponse.from(user));
         } catch (IllegalArgumentException e) {
@@ -411,8 +422,9 @@ public class UsuarioRestController {
         @jakarta.validation.constraints.NotNull java.time.LocalDate birthDate,
         boolean showBirthday,
         @jakarta.validation.constraints.NotBlank String course,
-        @jakarta.validation.constraints.NotNull Integer period,
-        @jakarta.validation.constraints.NotBlank String username
+        @jakarta.validation.constraints.NotBlank String period,
+        @jakarta.validation.constraints.NotBlank String username,
+        @jakarta.validation.constraints.NotNull Boolean lgpdConsent
     ) {}
 
     public record ErrorDto(String message) {

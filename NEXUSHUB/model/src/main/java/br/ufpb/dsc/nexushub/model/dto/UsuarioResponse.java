@@ -20,7 +20,7 @@ public record UsuarioResponse(
         Integer genderType,
         String genderOther,
         String course,
-        Integer period,
+        String period,
         String matricula,
         String ingressPeriod,
         String conclusionPeriod,

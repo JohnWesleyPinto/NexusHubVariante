@@ -36,8 +36,11 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (identityService.hasUsers()) {
+        try {
+            identityService.findByEmail("rodrigo@nexushub.com");
             return;
+        } catch (Exception e) {
+            // Seeding is needed
         }
 
         User rodrigo = identityService.registerUser("Rodrigo Silva", "rodrigo@nexushub.com", "senha123", "STUDENT", "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150");
@@ -109,10 +112,24 @@ public class DataSeeder implements CommandLineRunner {
                 "Lojinha do Rodrigo",
                 "Materiais acadêmicos, livros e canecas personalizadas do curso.",
                 "https://images.unsplash.com/photo-1544816155-12df9643f363?w=150",
+                null,
+                "Cantina; Auditório; Biblioteca",
                 "Campus I",
                 true
         );
-        var shop = marketplaceService.createOrUpdateShop(rodrigo.getHuman().getId(), shopReq, rodrigo.getHuman().getId());
+        var shop = marketplaceService.createOrUpdateShop(rodrigo.getHuman().getId(), shopReq, rodrigo.getId());
+
+        // Seed Lojinha do John
+        var johnShopReq = new br.ufpb.dsc.nexushub.model.dto.ShopRequest(
+                "Lojinha do John",
+                "Eletrônicos, periféricos e peças de reposição para computador.",
+                "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=150",
+                "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500",
+                "Laboratórios; Biblioteca; RU",
+                "Rio Tinto",
+                true
+        );
+        marketplaceService.createOrUpdateShop(john.getHuman().getId(), johnShopReq, john.getId());
         
         var prod1 = new br.ufpb.dsc.nexushub.model.dto.ProductRequest(
                 shop.id(),
@@ -128,7 +145,7 @@ public class DataSeeder implements CommandLineRunner {
                 "Campus I",
                 true
         );
-        marketplaceService.createProduct(rodrigo.getHuman().getId(), prod1, rodrigo.getHuman().getId());
+        marketplaceService.createProduct(rodrigo.getHuman().getId(), prod1, rodrigo.getId());
 
         var prod2 = new br.ufpb.dsc.nexushub.model.dto.ProductRequest(
                 shop.id(),
@@ -144,6 +161,6 @@ public class DataSeeder implements CommandLineRunner {
                 "Campus I",
                 true
         );
-        marketplaceService.createProduct(rodrigo.getHuman().getId(), prod2, rodrigo.getHuman().getId());
+        marketplaceService.createProduct(rodrigo.getHuman().getId(), prod2, rodrigo.getId());
     }
 }

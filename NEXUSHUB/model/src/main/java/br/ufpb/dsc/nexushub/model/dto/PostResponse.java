@@ -18,7 +18,8 @@ public record PostResponse(
         LocalDateTime timestamp,
         List<CommentResponse> comments,
         String postType,
-        UUID groupId
+        UUID groupId,
+        UUID projectId
 ) {
     public static PostResponse from(Post post, int likesCount, boolean likedByCurrentUser, List<CommentResponse> comments) {
         if (post == null) return null;
@@ -35,7 +36,8 @@ public record PostResponse(
                 post.getUpdatedAt(),
                 comments,
                 post.getPostType(),
-                post.getGroupId()
+                post.getGroupId(),
+                post.getProjectId()
         );
     }
 }

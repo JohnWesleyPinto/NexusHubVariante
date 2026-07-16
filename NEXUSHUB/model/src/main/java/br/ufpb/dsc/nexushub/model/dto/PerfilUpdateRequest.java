@@ -15,7 +15,7 @@ public record PerfilUpdateRequest(
         String genderOther,
         boolean showBirthday,
         String course,
-        Integer period,
+        String period,
         String matricula,
         @jakarta.validation.constraints.Pattern(regexp = "^$|^\\d{4}\\.[12]$", message = "Período de ingresso deve estar no formato YYYY.Semestre (ex: 2023.1)")
         String ingressPeriod,

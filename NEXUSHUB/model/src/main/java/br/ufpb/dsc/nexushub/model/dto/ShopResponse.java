@@ -9,6 +9,8 @@ public record ShopResponse(
         String name,
         String description,
         String logo,
+        String banner,
+        String meetLocations,
         String campus,
         boolean active
 ) {
@@ -20,6 +22,8 @@ public record ShopResponse(
                 shop.getName(),
                 shop.getDescription(),
                 shop.getLogo(),
+                shop.getBanner(),
+                shop.getMeetLocations(),
                 shop.getCampus(),
                 shop.isActive()
         );

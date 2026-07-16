@@ -127,9 +127,9 @@ class IdentityServiceImplTest {
         when(users.save(user)).thenReturn(user);
 
         java.time.LocalDate bDate = java.time.LocalDate.of(2000, 1, 1);
-        assertSame(user, service.completeOnboarding(id, "Ana", bDate, true, "Computer Science", 4, "ana_silva"));
+        assertSame(user, service.completeOnboarding(id, "Ana", bDate, true, "Computer Science", "4", "ana_silva"));
 
-        verify(human).updateOnboarding("Ana", bDate, true, "Computer Science", 4, id);
+        verify(human).updateOnboarding("Ana", bDate, true, "Computer Science", "4", id);
         verify(human).setUsername("ana_silva");
         verify(user).completeOnboarding(id);
         verify(humans).save(human);
@@ -140,7 +140,7 @@ class IdentityServiceImplTest {
         UUID id = UUID.randomUUID();
         when(users.findById(id)).thenReturn(Optional.empty());
         assertThrows(IllegalArgumentException.class, () -> 
-            service.completeOnboarding(id, "Ana", null, true, "CS", 1, "ana_silva")
+            service.completeOnboarding(id, "Ana", null, true, "CS", "1", "ana_silva")
         );
     }
 
@@ -160,7 +160,7 @@ class IdentityServiceImplTest {
         br.ufpb.dsc.nexushub.model.dto.PerfilUpdateRequest req = new br.ufpb.dsc.nexushub.model.dto.PerfilUpdateRequest(
             "ana_silva", "Ana", "a@b.com", "newpassword", "my bio", "http://photo",
             java.time.LocalDate.of(2000, 1, 1), 1, null, true,
-            "CS", 3, "12345", "2021.1", "2025.2", "9999", "git", "insta", "link", "web",
+            "CS", "3", "12345", "2021.1", "2025.2", "9999", "git", "insta", "link", "web",
             true, true, true, true, true, "exp", "edu", "cert", List.of("Java")
         );
 
@@ -193,7 +193,7 @@ class IdentityServiceImplTest {
         br.ufpb.dsc.nexushub.model.dto.PerfilUpdateRequest req = new br.ufpb.dsc.nexushub.model.dto.PerfilUpdateRequest(
             "ana_silva", "Ana", "a@b.com", null, "my bio", "http://photo",
             java.time.LocalDate.of(2000, 1, 1), 1, null, true,
-            "CS", 3, "12345", "2021.1", "2025.2", "9999", "git", "insta", "link", "web",
+            "CS", "3", "12345", "2021.1", "2025.2", "9999", "git", "insta", "link", "web",
             true, true, true, true, true, "exp", "edu", "cert", List.of("NewTech", " ")
         );
 

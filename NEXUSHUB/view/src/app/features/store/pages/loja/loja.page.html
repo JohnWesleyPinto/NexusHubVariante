@@ -110,7 +110,7 @@
   <!-- 3. SELLER MODE -->
   <div *ngIf="activeTab() === 'venda'" class="seller-section">
     <!-- Seller Dashboard Header -->
-    <div class="seller-dashboard-header card">
+    <div class="seller-dashboard-header card" [style.background-image]="myShop()?.banner ? 'linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), url(' + myShop()?.banner + ')' : 'none'" style="background-size: cover; background-position: center; transition: background 0.3s ease;">
       <div class="seller-shop-profile" *ngIf="myShop()">
         <img *ngIf="myShop()?.logo" [src]="myShop()?.logo" class="shop-logo-img" alt="Logo da loja" />
         <div *ngIf="!myShop()?.logo" class="shop-logo-placeholder">
@@ -198,13 +198,45 @@
             </div>
           </div>
 
-          <div class="form-group checkbox-group-modern">
-            <label class="toggle-container-modern">
-              <input type="checkbox" [(ngModel)]="shopFormActive" name="active" />
-              <span class="checkmark-modern"></span>
-              Lojinha está aberta para receber pedidos (Online)
+          <div class="form-group">
+            <label>Banner da Loja</label>
+            <input type="file" (change)="onBannerUpload($event)" accept="image/*" class="file-input-modern" />
+            <div class="banner-preview-inline" *ngIf="shopFormBanner" style="margin-top: 8px;">
+              <img [src]="shopFormBanner" alt="Banner preview" style="width: 100%; max-height: 100px; object-fit: cover; border-radius: 4px;" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Locations Selection -->
+        <div class="form-group" style="margin-top: 15px;">
+          <label style="font-weight: 700; color: var(--color-text);">Pontos de Encontro Atendidos no Campus *</label>
+          <div class="meeting-locations-checkboxes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 8px; background: #f8fafc; border: 1px solid var(--color-border); border-radius: 8px; padding: 12px;">
+            <label *ngFor="let loc of getMeetLocationsForCampus(shopFormCampus)" style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--color-text); cursor: pointer;">
+              <input type="checkbox" [checked]="isLocationSelected(loc)" (change)="toggleLocationSelection(loc)" />
+              {{ loc }}
             </label>
           </div>
+          
+          <div class="custom-location-add" style="display: flex; gap: 8px; margin-top: 12px;">
+            <input type="text" [(ngModel)]="customLocationInput" name="customLocationInput" placeholder="Outro local personalizado..." style="flex: 1; padding: 8px 12px; border: 1px solid var(--color-border); border-radius: 6px;" />
+            <button type="button" class="btn btn-secondary" style="padding: 8px 16px;" (click)="addCustomLocation()">Adicionar</button>
+          </div>
+
+          <!-- Selected Locations Summary Chips -->
+          <div class="selected-locations-chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
+            <span *ngFor="let selLoc of getSelectedLocationsList()" class="badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+              {{ selLoc }}
+              <button type="button" (click)="toggleLocationSelection(selLoc)" style="background: none; border: none; padding: 0; color: #1d4ed8; font-size: 14px; font-weight: 700; cursor: pointer; line-height: 1;">&times;</button>
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group checkbox-group-modern" style="margin-top: 15px;">
+          <label class="toggle-container-modern">
+            <input type="checkbox" [(ngModel)]="shopFormActive" name="active" />
+            <span class="checkmark-modern"></span>
+            Lojinha está aberta para receber pedidos (Online)
+          </label>
         </div>
 
         <div class="settings-actions">
@@ -404,11 +436,10 @@
               <label for="purchase-location">Local de Encontro Selecionado *</label>
               <select id="purchase-location" [(ngModel)]="purchaseLocation">
                 <option value="" disabled selected>Escolha onde retirar</option>
-                <option *ngFor="let loc of (product.meetLocations ? product.meetLocations.split(';') : [])" [value]="loc.trim()">
-                  {{ loc.trim() }}
+                <option *ngFor="let loc of getMeetingLocationsForProduct(product)" [value]="loc">
+                  {{ loc }}
                 </option>
               </select>
-              <input *ngIf="!(product.meetLocations)" type="text" id="purchase-location-text" [(ngModel)]="purchaseLocation" placeholder="Escreva o local de encontro" />
             </div>
 
             <div class="form-group">
@@ -483,17 +514,66 @@
             </div>
           </div>
 
+          <div class="form-group">
+            <label for="shop-banner">Banner da Loja (Upload de imagem)</label>
+            <input type="file" id="shop-banner" (change)="onBannerUpload($event)" accept="image/*" />
+            <div class="banner-preview-container" *ngIf="shopFormBanner" style="margin-top: 8px;">
+              <img [src]="shopFormBanner" class="uploaded-banner-preview" alt="Prévia do banner" style="width: 100%; max-height: 100px; object-fit: cover; border-radius: 4px;" />
+            </div>
+          </div>
+
+          <!-- Locations Selection -->
+          <div class="form-group" style="margin-top: 15px;">
+            <label style="font-weight: 700; color: var(--color-text);">Pontos de Encontro Atendidos no Campus *</label>
+            <div class="meeting-locations-checkboxes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 8px; background: #f8fafc; border: 1px solid var(--color-border); border-radius: 8px; padding: 12px;">
+              <label *ngFor="let loc of getMeetLocationsForCampus(shopFormCampus)" style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--color-text); cursor: pointer;">
+                <input type="checkbox" [checked]="isLocationSelected(loc)" (change)="toggleLocationSelection(loc)" />
+                {{ loc }}
+              </label>
+            </div>
+            
+            <div class="custom-location-add" style="display: flex; gap: 8px; margin-top: 12px;">
+              <input type="text" [(ngModel)]="customLocationInput" name="customLocationInput" placeholder="Outro local personalizado..." style="flex: 1; padding: 8px 12px; border: 1px solid var(--color-border); border-radius: 6px;" />
+              <button type="button" class="btn btn-secondary" style="padding: 8px 16px;" (click)="addCustomLocation()">Adicionar</button>
+            </div>
+
+            <!-- Selected Locations Summary Chips -->
+            <div class="selected-locations-chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
+              <span *ngFor="let selLoc of getSelectedLocationsList()" class="badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                {{ selLoc }}
+                <button type="button" (click)="toggleLocationSelection(selLoc)" style="background: none; border: none; padding: 0; color: #1d4ed8; font-size: 14px; font-weight: 700; cursor: pointer; line-height: 1;">&times;</button>
+              </span>
+            </div>
+          </div>
+
           <div class="form-group checkbox-group">
             <label>
               <input type="checkbox" [(ngModel)]="shopFormActive" name="active" />
               Lojinha está aberta para receber pedidos (Online)
             </label>
           </div>
+
+          <!-- Terms of Use Acceptance -->
+          <div class="form-group terms-acceptance-wrapper" *ngIf="!myShop()" style="border-top: 1px dashed var(--color-border); padding-top: 16px; margin-top: 16px;">
+            <div class="terms-text-box" style="background: #f8fafc; border: 1px solid var(--color-border); border-radius: 6px; padding: 12px; font-size: 12px; color: var(--color-muted); max-height: 100px; overflow-y: auto; margin-bottom: 10px;">
+              <strong>Termos de Uso do Marketplace Acadêmico (NexusHub)</strong>
+              <p>Ao ativar sua lojinha no NexusHub, você concorda que:</p>
+              <ul>
+                <li>Todas as negociações de venda, entrega e pagamento são de inteira responsabilidade do vendedor e do comprador.</li>
+                <li>Não é permitida a venda de itens ilícitos, drogas, bebidas alcoólicas, armas, ou qualquer outro produto que viole as regras do regimento acadêmico.</li>
+                <li>Você concorda em fornecer informações verídicas e manter o estoque de seus produtos atualizado.</li>
+              </ul>
+            </div>
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--color-text); cursor: pointer;">
+              <input type="checkbox" [(ngModel)]="termsAccepted" name="termsAccepted" required />
+              Li e concordo com os Termos de Uso do Campus
+            </label>
+          </div>
         </div>
 
         <footer class="modal-footer">
           <button type="button" class="btn btn-secondary" (click)="closeShopModal()">Cancelar</button>
-          <button type="submit" class="btn btn-primary" [disabled]="savingShop()">
+          <button type="submit" class="btn btn-primary" [disabled]="savingShop() || (!myShop() && !termsAccepted)">
             {{ savingShop() ? 'Salvando...' : 'Salvar Loja' }}
           </button>
         </footer>

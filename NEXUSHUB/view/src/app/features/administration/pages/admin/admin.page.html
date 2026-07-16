@@ -394,8 +394,8 @@
           <div class="campus-card-body">
             <p>Foco acadêmico principal em Ciências Tecnológicas e Sistemas de Informação.</p>
             <div class="campus-quick-stats">
-              <div class="q-stat"><span>Projetos Ativos:</span><strong>12</strong></div>
-              <div class="q-stat"><span>Estudantes:</span><strong>340</strong></div>
+              <div class="q-stat"><span>Projetos Ativos:</span><strong>{{ campiStats()?.rioTinto?.projects ?? 0 }}</strong></div>
+              <div class="q-stat"><span>Estudantes:</span><strong>{{ campiStats()?.rioTinto?.students ?? 0 }}</strong></div>
             </div>
           </div>
         </div>
@@ -412,8 +412,8 @@
           <div class="campus-card-body">
             <p>Cursos de Ciências Sociais Aplicadas, Humanas, Contabilidade e Design.</p>
             <div class="campus-quick-stats">
-              <div class="q-stat"><span>Projetos Ativos:</span><strong>8</strong></div>
-              <div class="q-stat"><span>Estudantes:</span><strong>290</strong></div>
+              <div class="q-stat"><span>Projetos Ativos:</span><strong>{{ campiStats()?.mamanguape?.projects ?? 0 }}</strong></div>
+              <div class="q-stat"><span>Estudantes:</span><strong>{{ campiStats()?.mamanguape?.students ?? 0 }}</strong></div>
             </div>
           </div>
         </div>

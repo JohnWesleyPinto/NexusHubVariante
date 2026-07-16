@@ -130,7 +130,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     @Transactional
-    public User completeOnboarding(UUID userId, String nome, java.time.LocalDate birthDate, boolean showBirthday, String course, Integer period, String username) {
+    public User completeOnboarding(UUID userId, String nome, java.time.LocalDate birthDate, boolean showBirthday, String course, String period, String username) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario nao encontrado."));
         

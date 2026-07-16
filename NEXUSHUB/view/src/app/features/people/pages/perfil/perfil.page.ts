@@ -63,7 +63,7 @@ export class PerfilPageComponent implements OnInit {
   protected editGenderOther = '';
   protected editShowBirthday = true;
   protected editCourse = '';
-  protected editPeriod = 1;
+  protected editPeriod = '';
   protected editMatricula = '';
   protected editIngressPeriod = '';
   protected editConclusionPeriod = '';
@@ -331,7 +331,7 @@ export class PerfilPageComponent implements OnInit {
       this.editGenderOther = user.genderOther || '';
       this.editShowBirthday = user.showBirthday !== false;
       this.editCourse = user.course || '';
-      this.editPeriod = user.period || 1;
+      this.editPeriod = user.period || '';
       this.editMatricula = user.matricula || '';
       this.editIngressPeriod = user.ingressPeriod || '';
       this.editConclusionPeriod = user.conclusionPeriod || '';

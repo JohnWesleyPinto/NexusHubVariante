@@ -13,6 +13,8 @@ export interface Shop {
   name: string;
   description?: string;
   logo?: string;
+  banner?: string;
+  meetLocations?: string;
   campus: string;
   active: boolean;
 }
@@ -97,6 +99,10 @@ export class LojaPageComponent implements OnInit {
   protected shopFormName = '';
   protected shopFormDescription = '';
   protected shopFormLogo = '';
+  protected shopFormBanner = '';
+  protected shopFormMeetLocations: string[] = [];
+  protected customLocationInput = '';
+  protected termsAccepted = false;
   protected shopFormCampus = 'Rio Tinto';
   protected shopFormActive = true;
   protected savingShop = signal(false);
@@ -123,6 +129,8 @@ export class LojaPageComponent implements OnInit {
       this.shopFormName = shop.name;
       this.shopFormDescription = shop.description || '';
       this.shopFormLogo = shop.logo || '';
+      this.shopFormBanner = shop.banner || '';
+      this.shopFormMeetLocations = shop.meetLocations ? shop.meetLocations.split(';').map(l => l.trim()).filter(l => l.length > 0) : [];
       this.shopFormCampus = shop.campus;
       this.shopFormActive = shop.active;
       this.showShopSettings.set(!this.showShopSettings());
@@ -242,7 +250,26 @@ export class LojaPageComponent implements OnInit {
 
     const buyer = this.currentUser();
     const buyerName = buyer?.nome || 'Comprador';
-    const text = `Olá! Tenho interesse no produto "${product.title}".\nQuantidade: ${this.purchaseQuantity}\nLocal de encontro selecionado: ${this.purchaseLocation}\nMeu nome é: ${buyerName}.`;
+    const totalPrice = product.price * this.purchaseQuantity;
+    
+    let text = '';
+    if (product.shopId) {
+      text = `Olá, vim do *NexusHub*! Gostaria de finalizar a compra:\n\n` +
+             `🛒 *Pedido:* ${product.title} (Qtd: ${this.purchaseQuantity})\n` +
+             `💰 *Valor Total:* R$ ${totalPrice.toFixed(2)}\n` +
+             `📍 *Ponto de Encontro:* ${this.purchaseLocation} (${product.campus})\n` +
+             `💳 *Método de Pagamento:* ${this.purchasePaymentMethod}\n`;
+      if (this.purchasePaymentMethod === 'Pix') {
+        text += `⚠️ _Já realizei a transferência via Pix e estou enviando o comprovante em anexo!_\n`;
+      }
+      text += `\n*Comprador:* ${buyerName}`;
+    } else {
+      text = `Olá, vim do *NexusHub*! Vi seu anúncio avulso e tenho interesse no produto:\n\n` +
+             `📦 *Item:* ${product.title}\n` +
+             `💰 *Preço:* R$ ${product.price.toFixed(2)}\n` +
+             `📍 *Local de Encontro:* ${this.purchaseLocation} (${product.campus})\n\n` +
+             `Gostaria de negociar a entrega. Meu nome é *${buyerName}*.`;
+    }
     
     let phone = product.sellerPhone || '5583999999999';
     phone = phone.replace(/\D/g, '');
@@ -261,14 +288,19 @@ export class LojaPageComponent implements OnInit {
       this.shopFormName = shop.name;
       this.shopFormDescription = shop.description || '';
       this.shopFormLogo = shop.logo || '';
+      this.shopFormBanner = shop.banner || '';
+      this.shopFormMeetLocations = shop.meetLocations ? shop.meetLocations.split(';').map(l => l.trim()).filter(l => l.length > 0) : [];
       this.shopFormCampus = shop.campus;
       this.shopFormActive = shop.active;
     } else {
       this.shopFormName = '';
       this.shopFormDescription = '';
       this.shopFormLogo = '';
+      this.shopFormBanner = '';
+      this.shopFormMeetLocations = [];
       this.shopFormCampus = 'Rio Tinto';
       this.shopFormActive = true;
+      this.termsAccepted = false;
     }
     this.showShopModal.set(true);
   }
@@ -295,12 +327,18 @@ export class LojaPageComponent implements OnInit {
       this.toastService.showWarning('Nome da loja é obrigatório.');
       return;
     }
+    if (!this.myShop() && !this.termsAccepted) {
+      this.toastService.showWarning('É necessário aceitar os Termos de Uso.');
+      return;
+    }
 
     this.savingShop.set(true);
     const payload = {
       name: this.shopFormName.trim(),
       description: this.shopFormDescription.trim(),
       logo: this.shopFormLogo,
+      banner: this.shopFormBanner,
+      meetLocations: this.shopFormMeetLocations.join(';'),
       campus: this.shopFormCampus,
       active: this.shopFormActive
     };
@@ -329,6 +367,8 @@ export class LojaPageComponent implements OnInit {
       name: shop.name,
       description: shop.description || '',
       logo: shop.logo || '',
+      banner: shop.banner || '',
+      meetLocations: shop.meetLocations || '',
       campus: shop.campus,
       active: !shop.active
     };
@@ -348,6 +388,10 @@ export class LojaPageComponent implements OnInit {
   }
 
   openCreateProduct() {
+    if (!this.currentUser()?.whatsapp) {
+      this.toastService.showWarning('Você precisa cadastrar seu WhatsApp no seu perfil para poder anunciar produtos.');
+      return;
+    }
     this.editingProductId.set(null);
     this.productFormTitle = '';
     this.productFormDescription = '';
@@ -357,7 +401,7 @@ export class LojaPageComponent implements OnInit {
     this.productFormPhotos = '';
     this.productFormPaymentMethods = 'Pix';
     this.productFormPixKey = '';
-    this.productFormMeetLocations = '';
+    this.productFormMeetLocations = this.myShop()?.meetLocations || '';
     this.productFormCampus = this.myShop()?.campus || 'Rio Tinto';
     this.productFormActive = true;
     this.showProductModal.set(true);
@@ -510,5 +554,57 @@ export class LojaPageComponent implements OnInit {
         resolve(canvas.toDataURL('image/jpeg', 0.7));
       };
     });
+  }
+
+  onBannerUpload(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.compressImage(e.target.result).then(compressed => {
+          this.shopFormBanner = compressed;
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  getMeetLocationsForCampus(campus: string): string[] {
+    if (campus === 'Rio Tinto') {
+      return ['RA', 'RE', 'Laboratórios', 'Biblioteca', 'Coordenação', 'Centros Acadêmicos', 'Oca', 'RU'];
+    }
+    return ['Cantina', 'Auditório', 'Biblioteca', 'Coordenação', 'Estacionamento'];
+  }
+
+  isLocationSelected(location: string): boolean {
+    return this.shopFormMeetLocations.includes(location);
+  }
+
+  toggleLocationSelection(location: string) {
+    const idx = this.shopFormMeetLocations.indexOf(location);
+    if (idx > -1) {
+      this.shopFormMeetLocations.splice(idx, 1);
+    } else {
+      this.shopFormMeetLocations.push(location);
+    }
+  }
+
+  addCustomLocation() {
+    const custom = this.customLocationInput.trim();
+    if (custom && !this.shopFormMeetLocations.includes(custom)) {
+      this.shopFormMeetLocations.push(custom);
+    }
+    this.customLocationInput = '';
+  }
+
+  getSelectedLocationsList(): string[] {
+    return this.shopFormMeetLocations;
+  }
+
+  getMeetingLocationsForProduct(product: Product): string[] {
+    if (product.meetLocations) {
+      return product.meetLocations.split(';').map(l => l.trim()).filter(l => l.length > 0);
+    }
+    return this.getMeetLocationsForCampus(product.campus);
   }
 }

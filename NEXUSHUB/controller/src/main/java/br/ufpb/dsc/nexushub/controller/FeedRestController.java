@@ -60,13 +60,27 @@ public class FeedRestController {
         return ResponseEntity.ok(feedService.getFeedByGroup(groupId, currentHumanId, page, size));
     }
 
+    @GetMapping("/projeto/{projectId}")
+    public ResponseEntity<List<PostResponse>> getProjectFeed(
+            @PathVariable UUID projectId,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "0") int page,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "10") int size,
+            Principal principal) {
+        UUID currentHumanId = null;
+        if (principal != null) {
+            User user = identityService.findByEmail(principal.getName());
+            currentHumanId = user.getHuman().getId();
+        }
+        return ResponseEntity.ok(feedService.getFeedByProject(projectId, currentHumanId, page, size));
+    }
+
     @PostMapping
     public ResponseEntity<?> createPost(@Valid @RequestBody PostRequest request, Principal principal) {
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         User user = identityService.findByEmail(principal.getName());
-        Post post = feedService.createPost(user.getHuman().getId(), request.content(), request.imageUrl(), request.postType(), request.groupId(), user.getId());
+        Post post = feedService.createPost(user.getHuman().getId(), request.content(), request.imageUrl(), request.postType(), request.groupId(), request.projectId(), user.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(post);
     }
 
@@ -104,7 +118,8 @@ public class FeedRestController {
             @NotBlank @jakarta.validation.constraints.Size(max = 3000, message = "O post não pode exceder 3000 caracteres.") String content,
             String imageUrl,
             String postType,
-            UUID groupId
+            UUID groupId,
+            UUID projectId
     ) {}
 
     public record CommentRequest(

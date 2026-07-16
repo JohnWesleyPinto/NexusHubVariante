@@ -113,7 +113,7 @@
               <h5>Dados Acadêmicos</h5>
               <ul class="linkedin-detail-list">
                 <li><strong>Curso:</strong> <span>{{ profileUser()?.course || 'Não informado' }}</span></li>
-                <li><strong>Período Atual:</strong> <span>{{ profileUser()?.period ? profileUser()?.period + 'º' : 'Não informado' }}</span></li>
+                <li><strong>Período Atual:</strong> <span>{{ profileUser()?.period ? (profileUser()?.period.toString().includes('.') ? profileUser()?.period : profileUser()?.period + 'º') : 'Não informado' }}</span></li>
                 <li><strong>Matrícula:</strong> <span>{{ profileUser()?.matricula || 'Não informada' }}</span></li>
                 <li><strong>Ingresso:</strong> <span>{{ profileUser()?.ingressPeriod || 'Não informado' }}</span></li>
                 <li><strong>Conclusão:</strong> <span>{{ profileUser()?.conclusionPeriod || 'Não informado' }}</span></li>
@@ -540,7 +540,7 @@
 
           <div class="form-group">
             <label for="period">Período Atual *</label>
-            <input type="number" id="edit-period" name="period" [(ngModel)]="editPeriod" required min="1" max="20" />
+            <input type="text" id="edit-period" name="period" [(ngModel)]="editPeriod" required placeholder="Ex: 2023.1 ou 5" />
           </div>
         </div>
 
@@ -738,7 +738,7 @@
               </div>
               <div class="preview-academic-item" *ngIf="editPeriod">
                 <span class="preview-academic-icon">📅</span>
-                <span>{{ editPeriod }}º Período · UFPB</span>
+                <span>{{ editPeriod.toString().includes('.') ? editPeriod : editPeriod + 'º Período' }} · UFPB</span>
               </div>
               <div class="preview-academic-item" *ngIf="editIngressPeriod">
                 <span class="preview-academic-icon">🏁</span>

@@ -30,4 +30,9 @@ public class AdminMetricsRestController {
     public Map<String, Long> getCourses() {
         return metricsService.getEngagementByCourse();
     }
+
+    @GetMapping("/campi")
+    public Map<String, Object> getCampi() {
+        return metricsService.getCampiStats();
+    }
 }

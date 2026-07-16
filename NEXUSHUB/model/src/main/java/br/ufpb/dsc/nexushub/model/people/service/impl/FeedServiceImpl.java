@@ -92,6 +92,21 @@ public class FeedServiceImpl implements FeedService {
         return mapPostsToResponses(postsPage.getContent(), currentHumanId);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<PostResponse> getFeedByProject(UUID projectId, UUID currentHumanId) {
+        List<Post> posts = postRepository.findAllByProjectIdAndRecordStatusOrderByUpdatedAtDesc(projectId, 1);
+        return mapPostsToResponses(posts, currentHumanId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PostResponse> getFeedByProject(UUID projectId, UUID currentHumanId, int page, int size) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        org.springframework.data.domain.Page<Post> postsPage = postRepository.findAllByProjectIdAndRecordStatusOrderByUpdatedAtDesc(projectId, 1, pageable);
+        return mapPostsToResponses(postsPage.getContent(), currentHumanId);
+    }
+
     private List<PostResponse> mapPostsToResponses(List<Post> posts, UUID currentHumanId) {
         return posts.stream().map(post -> {
             List<CommentResponse> comments = commentRepository
@@ -129,11 +144,17 @@ public class FeedServiceImpl implements FeedService {
     @Override
     @Transactional
     public Post createPost(UUID authorHumanId, String content, String imageUrl, String postType, UUID groupId, UUID currentUserId) {
+        return createPost(authorHumanId, content, imageUrl, postType, groupId, null, currentUserId);
+    }
+
+    @Override
+    @Transactional
+    public Post createPost(UUID authorHumanId, String content, String imageUrl, String postType, UUID groupId, UUID projectId, UUID currentUserId) {
         Human author = humanRepository.findById(authorHumanId)
                 .orElseThrow(() -> new IllegalArgumentException("Autor não encontrado."));
         String resolvedType = postType == null || postType.trim().isBlank() ? "USER" : postType.trim().toUpperCase();
         String censoredContent = censorContent(content);
-        Post post = new Post(author, censoredContent, imageUrl, resolvedType, groupId, currentUserId);
+        Post post = new Post(author, censoredContent, imageUrl, resolvedType, groupId, projectId, currentUserId);
         return postRepository.save(post);
     }
 

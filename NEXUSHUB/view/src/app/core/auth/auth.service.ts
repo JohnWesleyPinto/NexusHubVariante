@@ -18,7 +18,7 @@ export interface UsuarioResponse {
   genderType?: number;
   genderOther?: string;
   course?: string;
-  period?: number;
+  period?: string;
   matricula?: string;
   ingressPeriod?: number;
   conclusionPeriod?: number;

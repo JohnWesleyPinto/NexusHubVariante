@@ -20,9 +20,15 @@ public interface FeedService {
 
     Post createPost(UUID authorHumanId, String content, String imageUrl, String postType, UUID groupId, UUID currentUserId);
 
+    Post createPost(UUID authorHumanId, String content, String imageUrl, String postType, UUID groupId, UUID projectId, UUID currentUserId);
+
     List<PostResponse> getFeedByGroup(UUID groupId, UUID currentHumanId);
 
     List<PostResponse> getFeedByGroup(UUID groupId, UUID currentHumanId, int page, int size);
+
+    List<PostResponse> getFeedByProject(UUID projectId, UUID currentHumanId);
+
+    List<PostResponse> getFeedByProject(UUID projectId, UUID currentHumanId, int page, int size);
 
     boolean toggleLike(UUID postId, UUID humanId);
 

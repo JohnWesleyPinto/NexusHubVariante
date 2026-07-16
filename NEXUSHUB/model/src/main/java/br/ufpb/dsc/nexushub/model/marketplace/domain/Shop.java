@@ -37,10 +37,18 @@ public class Shop extends AuditableEntity {
     @Column(name = "flactive", nullable = false)
     private boolean active = true;
 
-    public void update(String name, String description, String logo, String campus, boolean active, UUID updatedById) {
+    @Column(name = "dsbanner", columnDefinition = "TEXT")
+    private String banner;
+
+    @Column(name = "dsmeetlocations", columnDefinition = "TEXT")
+    private String meetLocations;
+
+    public void update(String name, String description, String logo, String banner, String meetLocations, String campus, boolean active, UUID updatedById) {
         this.name = name;
         this.description = description;
         this.logo = logo;
+        this.banner = banner;
+        this.meetLocations = meetLocations;
         this.campus = campus;
         this.active = active;
         touch(updatedById);

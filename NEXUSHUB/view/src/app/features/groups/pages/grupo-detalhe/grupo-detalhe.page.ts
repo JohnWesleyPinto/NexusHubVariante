@@ -84,7 +84,7 @@ export class GrupoDetalhePageComponent implements OnInit {
   protected novaVagaRequisitos = '';
 
   // Tab State
-  protected readonly activeTab = signal<'info' | 'feed'>('info');
+  protected readonly activeTab = signal<'forum' | 'mural' | 'links' | 'membros_tab'>('forum');
 
   // Group Feed Signals
   protected readonly groupFeedPosts = signal<FeedPost[]>([]);
@@ -197,9 +197,9 @@ export class GrupoDetalhePageComponent implements OnInit {
     }
   }
 
-  setTab(tab: 'info' | 'feed') {
+  setTab(tab: 'forum' | 'mural' | 'links' | 'membros_tab') {
     this.activeTab.set(tab);
-    if (tab === 'feed') {
+    if (tab === 'mural') {
       this.loadGroupFeed();
     }
   }

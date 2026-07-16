@@ -13,10 +13,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminMetricsService {
     private final AuditLogRepository auditLogRepository;
     private final UserRepository userRepository;
+    private final br.ufpb.dsc.nexushub.model.projects.repository.ProjectRepository projectRepository;
 
-    public AdminMetricsService(AuditLogRepository auditLogRepository, UserRepository userRepository) {
+    private static final Set<String> RIO_TINTO_COURSES = Set.of(
+        "Antropologia",
+        "Ciência da Computação",
+        "Design",
+        "Ecologia",
+        "Matemática",
+        "Sistemas de Informação"
+    );
+
+    public AdminMetricsService(AuditLogRepository auditLogRepository, UserRepository userRepository,
+                               br.ufpb.dsc.nexushub.model.projects.repository.ProjectRepository projectRepository) {
         this.auditLogRepository = auditLogRepository;
         this.userRepository = userRepository;
+        this.projectRepository = projectRepository;
     }
 
     @Transactional(readOnly = true)
@@ -75,5 +87,58 @@ public class AdminMetricsService {
             courseStats.put(course, courseStats.getOrDefault(course, 0L) + 1L);
         }
         return courseStats;
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Object> getCampiStats() {
+        List<User> allUsers = userRepository.findAll();
+        List<br.ufpb.dsc.nexushub.model.projects.domain.Project> allProjects = projectRepository.findAll();
+
+        long rtStudents = 0;
+        long mmpStudents = 0;
+
+        for (User u : allUsers) {
+            if (u.getHuman() != null) {
+                String course = u.getHuman().getCourse();
+                if (course != null && !course.isBlank()) {
+                    if (RIO_TINTO_COURSES.contains(course)) {
+                        rtStudents++;
+                    } else {
+                        mmpStudents++;
+                    }
+                }
+            }
+        }
+
+        long rtProjects = 0;
+        long mmpProjects = 0;
+
+        for (br.ufpb.dsc.nexushub.model.projects.domain.Project p : allProjects) {
+            if (p.getOwner() != null) {
+                String course = p.getOwner().getCourse();
+                if (course != null && !course.isBlank()) {
+                    if (RIO_TINTO_COURSES.contains(course)) {
+                        rtProjects++;
+                    } else {
+                        mmpProjects++;
+                    }
+                }
+            }
+        }
+
+        Map<String, Object> stats = new LinkedHashMap<>();
+        
+        Map<String, Object> rtStats = new LinkedHashMap<>();
+        rtStats.put("projects", rtProjects);
+        rtStats.put("students", rtStudents);
+
+        Map<String, Object> mmpStats = new LinkedHashMap<>();
+        mmpStats.put("projects", mmpProjects);
+        mmpStats.put("students", mmpStudents);
+
+        stats.put("rioTinto", rtStats);
+        stats.put("mamanguape", mmpStats);
+
+        return stats;
     }
 }

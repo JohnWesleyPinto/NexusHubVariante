@@ -19,23 +19,43 @@
       <div class="tabs-navigation-container">
         <button 
           class="tab-btn" 
-          [class.active]="activeTab() === 'info'"
-          [style.border-bottom-color]="activeTab() === 'info' ? (grupo()?.cor || '#1e3a8a') : 'transparent'"
-          [style.color]="activeTab() === 'info' ? (grupo()?.cor || '#1e3a8a') : '#64748b'"
-          (click)="setTab('info')"
+          [class.active]="activeTab() === 'forum'"
+          [style.border-bottom-color]="activeTab() === 'forum' ? (grupo()?.cor || '#1e3a8a') : 'transparent'"
+          [style.color]="activeTab() === 'forum' ? (grupo()?.cor || '#1e3a8a') : '#64748b'"
+          (click)="setTab('forum')"
         >
-          <span class="material-symbols-rounded">info</span>
-          Informações & Oportunidades
+          <span class="material-symbols-rounded">forum</span>
+          Fórum 0
         </button>
         <button 
           class="tab-btn" 
-          [class.active]="activeTab() === 'feed'"
-          [style.border-bottom-color]="activeTab() === 'feed' ? (grupo()?.cor || '#1e3a8a') : 'transparent'"
-          [style.color]="activeTab() === 'feed' ? (grupo()?.cor || '#1e3a8a') : '#64748b'"
-          (click)="setTab('feed')"
+          [class.active]="activeTab() === 'mural'"
+          [style.border-bottom-color]="activeTab() === 'mural' ? (grupo()?.cor || '#1e3a8a') : 'transparent'"
+          [style.color]="activeTab() === 'mural' ? (grupo()?.cor || '#1e3a8a') : '#64748b'"
+          (click)="setTab('mural')"
         >
-          <span class="material-symbols-rounded">forum</span>
-          Mural de Conversas
+          <span class="material-symbols-rounded">campaign</span>
+          Mural
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab() === 'links'"
+          [style.border-bottom-color]="activeTab() === 'links' ? (grupo()?.cor || '#1e3a8a') : 'transparent'"
+          [style.color]="activeTab() === 'links' ? (grupo()?.cor || '#1e3a8a') : '#64748b'"
+          (click)="setTab('links')"
+        >
+          <span class="material-symbols-rounded">link</span>
+          Links 0
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab() === 'membros_tab'"
+          [style.border-bottom-color]="activeTab() === 'membros_tab' ? (grupo()?.cor || '#1e3a8a') : 'transparent'"
+          [style.color]="activeTab() === 'membros_tab' ? (grupo()?.cor || '#1e3a8a') : '#64748b'"
+          (click)="setTab('membros_tab')"
+        >
+          <span class="material-symbols-rounded">group</span>
+          Membros {{ members().length }}
         </button>
       </div>
 
@@ -45,10 +65,26 @@
         <!-- Main Column (Left) -->
         <div class="main-info-column">
           
-          <!-- TAB 1: INFO & OPPORTUNITIES -->
-          <ng-container *ngIf="activeTab() === 'info'">
-            <!-- About Section -->
-            <div class="section-block animate-fade-in">
+          <!-- TAB 1: FÓRUM -->
+          <ng-container *ngIf="activeTab() === 'forum'">
+            <!-- Forum Filter / Search bar -->
+            <div class="forum-filters-row animate-fade-in">
+              <div class="forum-filter-buttons">
+                <button class="forum-filter-btn active">Recentes</button>
+                <button class="forum-filter-btn">Populares</button>
+                <button class="forum-filter-btn">Sem resposta</button>
+              </div>
+            </div>
+
+            <!-- Empty State for Forum -->
+            <div class="empty-state-box animate-fade-in">
+              <span class="material-symbols-rounded empty-icon" style="font-size: 48px; color: var(--color-muted); margin-bottom: 12px;">content_paste</span>
+              <p class="empty-list-text" style="font-weight: 700; color: var(--color-text); margin-bottom: 4px;">Nenhum tópico ainda. Abra o primeiro!</p>
+              <p class="empty-list-sub" style="font-size: 13px; color: var(--color-muted); margin-bottom: 16px;">Inicie uma discussão ou faça uma pergunta para movimentar o grupo.</p>
+            </div>
+            
+            <!-- Group Description & Projects block -->
+            <div class="section-block animate-fade-in" style="margin-top: 30px;">
               <div class="section-header-row">
                 <h3>Sobre o Grupo</h3>
                 <span class="privacy-pill" [class.private]="grupo()?.tipo === 'Restrito'">
@@ -57,22 +93,6 @@
                 </span>
               </div>
               <p class="description-text">{{ grupo()?.descricao }}</p>
-            </div>
-
-            <!-- Stats Dashboard -->
-            <div class="stats-dashboard animate-fade-in">
-              <div class="stat-card">
-                <span class="stat-num" [style.color]="grupo()?.cor || '#1e3a8a'">{{ members().length }}</span>
-                <span class="stat-label">Membros</span>
-              </div>
-              <div class="stat-card">
-                <span class="stat-num" [style.color]="grupo()?.cor || '#1e3a8a'">{{ groupProjects().length }}</span>
-                <span class="stat-label">Projetos Ativos</span>
-              </div>
-              <div class="stat-card">
-                <span class="stat-num" [style.color]="grupo()?.cor || '#1e3a8a'">{{ vagas().length }}</span>
-                <span class="stat-label">Vagas Abertas</span>
-              </div>
             </div>
 
             <!-- Join / Leave CTA -->
@@ -141,13 +161,6 @@
               <div class="empty-state-box" *ngIf="groupProjects().length === 0">
                 <div class="empty-icon">📁</div>
                 <p class="empty-list-text">Nenhum projeto ativo associado a este grupo ainda.</p>
-                <div class="academic-importance-box">
-                  <span class="material-symbols-rounded importance-icon">school</span>
-                  <div class="importance-info-text">
-                    <strong>A importância de projetos e comunidades:</strong>
-                    <p>Participar ativamente de projetos de inovação e comunidades acadêmicas é um pilar vital para a sua formação. Eles conectam o conhecimento teórico à prática, desenvolvem competências de liderança e comunicação, e criam uma rede valiosa de contatos para o seu futuro.</p>
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -237,8 +250,8 @@
             </div>
           </ng-container>
 
-          <!-- TAB 2: CONVERSATION FEED -->
-          <ng-container *ngIf="activeTab() === 'feed'">
+          <!-- TAB 2: MURAL -->
+          <ng-container *ngIf="activeTab() === 'mural'">
             <!-- Create Post Card -->
             <div class="group-create-post-card animate-fade-in" *ngIf="isJoinedUser() || isCoordinator()">
               <div 
@@ -382,30 +395,69 @@
             </div>
           </ng-container>
 
+          <!-- TAB 3: LINKS -->
+          <ng-container *ngIf="activeTab() === 'links'">
+            <div class="empty-state-box animate-fade-in">
+              <span class="material-symbols-rounded empty-icon" style="font-size: 48px; color: var(--color-muted); margin-bottom: 12px;">link</span>
+              <p class="empty-list-text" style="font-weight: 700; color: var(--color-text); margin-bottom: 4px;">Nenhum link útil cadastrado.</p>
+              <p class="empty-list-sub" style="font-size: 13px; color: var(--color-muted);">Compartilhe links importantes, repositórios ou documentações do grupo.</p>
+            </div>
+          </ng-container>
+
+          <!-- TAB 4: MEMBROS TAB -->
+          <ng-container *ngIf="activeTab() === 'membros_tab'">
+            <div class="members-tab-grid animate-fade-in" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px;">
+              <div 
+                class="member-tab-card" 
+                *ngFor="let mb of members()"
+                [class.coordinator]="isMembroCoordenador(mb.nome)"
+                style="background: white; border: 1px solid var(--color-border); border-radius: var(--border-radius-md); padding: 16px; display: flex; align-items: center; gap: 12px;"
+              >
+                <div class="avatar-wrapper" style="position: relative;">
+                  <img [src]="isMembroCoordenador(mb.nome) && grupo()?.logo && (grupo()?.logo || '').length > 20 ? grupo()?.logo : mb.fotoUrl" alt="Foto do Membro" class="avatar-photo" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;" />
+                  <span class="crown-badge" *ngIf="isMembroCoordenador(mb.nome)" style="position: absolute; top: -6px; right: -6px; font-size: 14px;">👑</span>
+                </div>
+                <div class="user-text-info">
+                  <div class="u-name" style="font-weight: 800; font-size: 14px; color: var(--color-text);">{{ mb.nome }}</div>
+                  <div class="u-role" style="font-size: 11px; color: var(--color-muted);">{{ mb.papel }}</div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+
         </div>
 
         <!-- Sidebar Column (Right) -->
         <aside class="sidebar-column">
-          <h3>Membros do Grupo ({{ members().length }})</h3>
-          
-          <div class="members-list-container">
-            <!-- Members Loop -->
-            <div 
-              class="sidebar-user" 
-              *ngFor="let mb of members()"
-              [class.coordinator]="isMembroCoordenador(mb.nome)"
-            >
-              <div class="avatar-wrapper">
-                <img [src]="isMembroCoordenador(mb.nome) && grupo()?.logo && (grupo()?.logo || '').length > 20 ? grupo()?.logo : mb.fotoUrl" alt="Foto do Membro" class="avatar-photo" />
-                <span class="crown-badge" *ngIf="isMembroCoordenador(mb.nome)">👑</span>
-              </div>
-              
-              <div class="user-text-info">
-                <span class="u-name">{{ mb.nome }}</span>
-                <span class="u-role">{{ mb.papel }}</span>
+          <section class="card-section" style="padding: 20px; display: flex; flex-direction: column; gap: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); border-radius: var(--border-radius-md); background: white;">
+            
+            <div class="sidebar-info-group" style="display: flex; flex-direction: column; gap: 4px;">
+              <span class="info-meta-label" style="font-size: 11px; font-weight: 800; color: var(--color-muted); letter-spacing: 0.5px;">CRIADO POR</span>
+              <span class="info-meta-value" style="font-size: 14px; font-weight: 700; color: var(--color-text);">{{ grupo()?.responsavel || 'Não cadastrado' }}</span>
+            </div>
+
+            <div class="sidebar-info-group" style="display: flex; flex-direction: column; gap: 4px; border-top: 1px dashed var(--color-border); padding-top: 12px;">
+              <span class="info-meta-label" style="font-size: 11px; font-weight: 800; color: var(--color-muted); letter-spacing: 0.5px;">MEMBROS</span>
+              <span class="info-meta-value" style="font-size: 14px; font-weight: 700; color: var(--color-text);">{{ members().length }}</span>
+            </div>
+
+            <div class="sidebar-info-group" style="display: flex; flex-direction: column; gap: 4px; border-top: 1px dashed var(--color-border); padding-top: 12px;">
+              <span class="info-meta-label" style="font-size: 11px; font-weight: 800; color: var(--color-muted); letter-spacing: 0.5px;">CRIADO EM</span>
+              <span class="info-meta-value" style="font-size: 14px; font-weight: 700; color: var(--color-text);">15/07/2026 22:20</span>
+            </div>
+            
+            <div class="related-section" *ngIf="groupProjects().length > 0" style="border-top: 1px dashed var(--color-border); padding-top: 12px; display: flex; flex-direction: column; gap: 10px;">
+              <span class="info-meta-label" style="font-size: 11px; font-weight: 800; color: var(--color-muted); letter-spacing: 0.5px;">PROJETOS RELACIONADOS</span>
+              <div class="related-item" *ngFor="let proj of groupProjects()" style="display: flex; align-items: center; gap: 10px;">
+                <img [src]="proj.imagemCardUrl || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=100'" alt="Projeto" class="related-img" style="width: 36px; height: 36px; border-radius: 4px; object-fit: cover;" />
+                <div class="related-info" style="display: flex; flex-direction: column;">
+                  <a [routerLink]="['/projetos', proj.id]" class="related-name" style="font-size: 13px; font-weight: 700; color: var(--color-primary); text-decoration: none;">{{ proj.nome }}</a>
+                  <span class="related-sub" style="font-size: 11px; color: var(--color-muted);">{{ proj.quantidadeMembros || 1 }} membro(s)</span>
+                </div>
               </div>
             </div>
-          </div>
+
+          </section>
         </aside>
 
       </div>

@@ -60,6 +60,7 @@ export class AdminPageComponent {
 
   // Selected Report Modal Preview
   readonly selectedReport = signal<any | null>(null);
+  readonly campiStats = signal<any>(null);
 
   openReportPreview(report: any) {
     this.selectedReport.set(report);
@@ -90,6 +91,7 @@ export class AdminPageComponent {
     this.loadLogs();
     this.loadUsers();
     this.loadCampusHighlights();
+    this.loadCampiStats();
   }
 
   setTab(tab: 'users' | 'security' | 'content' | 'gamification' | 'institutions' | 'reports') {
@@ -101,6 +103,8 @@ export class AdminPageComponent {
       this.loadUsers();
     } else if (tab === 'content') {
       this.loadCampusHighlights();
+    } else if (tab === 'institutions') {
+      this.loadCampiStats();
     }
   }
 
@@ -298,5 +302,12 @@ export class AdminPageComponent {
       PROJECT: 'Projeto',
       MEMBERSHIP: 'Participação'
     } as Record<string, string>)[entity] ?? entity;
+  }
+
+  loadCampiStats() {
+    this.http.get<any>(apiUrl('/api/admin/analytics/campi')).subscribe({
+      next: (data) => this.campiStats.set(data),
+      error: (err) => console.error('Erro ao buscar estatísticas de campi', err)
+    });
   }
 }
