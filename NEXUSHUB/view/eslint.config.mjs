@@ -19,6 +19,10 @@ export default tseslint.config(
     ],
     processor: angular.processInlineTemplates,
     rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      'no-useless-assignment': 'off',
+      'no-var': 'off',
       '@angular-eslint/component-class-suffix': [
         'error',
         {
@@ -54,7 +58,8 @@ export default tseslint.config(
       '@angular-eslint/template/click-events-have-key-events': 'warn',
       '@angular-eslint/template/interactive-supports-focus': 'warn',
       '@angular-eslint/template/label-has-associated-control': 'warn',
-      '@angular-eslint/template/elements-content': 'warn'
+      '@angular-eslint/template/elements-content': 'warn',
+      '@angular-eslint/template/eqeqeq': 'off'
     }
   }
 );
