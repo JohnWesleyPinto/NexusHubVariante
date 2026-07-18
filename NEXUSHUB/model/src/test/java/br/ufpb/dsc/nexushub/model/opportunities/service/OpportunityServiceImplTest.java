@@ -99,4 +99,30 @@ class OpportunityServiceImplTest {
         CandidaturaRequest req = new CandidaturaRequest("Mensagem", "8399999", null);
         assertNotNull(service.applyWithAnswers(oppId, humanId, req, humanId));
     }
+
+    @Test
+    void testGetOpportunityDetails() {
+        UUID oppId = UUID.randomUUID();
+        Opportunity opp = mock(Opportunity.class);
+        when(opp.getRecordStatus()).thenReturn(1);
+        when(opportunities.findById(oppId)).thenReturn(Optional.of(opp));
+        when(forms.findByOpportunityIdAndRecordStatus(any(), anyInt())).thenReturn(Optional.empty());
+
+        assertNotNull(service.getOpportunityDetails(oppId));
+
+        when(opp.getRecordStatus()).thenReturn(0);
+        assertThrows(IllegalArgumentException.class, () -> service.getOpportunityDetails(oppId));
+    }
+
+    @Test
+    void testDeleteOpportunity() {
+        UUID oppId = UUID.randomUUID();
+        UUID humanId = UUID.randomUUID();
+        Opportunity opp = mock(Opportunity.class);
+        when(opp.getRecordStatus()).thenReturn(1);
+        when(opportunities.findById(oppId)).thenReturn(Optional.of(opp));
+        when(opportunities.save(any())).thenAnswer(i -> i.getArgument(0));
+
+        assertDoesNotThrow(() -> service.deleteOpportunity(oppId, humanId));
+    }
 }
