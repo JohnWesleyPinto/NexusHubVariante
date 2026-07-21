@@ -1,7 +1,6 @@
 import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { OpportunityService, OportunidadeResponse, OportunidadeCadastroRequest, PerguntaRequest, CandidaturaRequest, RespostaCandidaturaRequest, OportunidadeDashboardResponse } from '../../services/opportunity.service';
 import { ProjectService, Projeto } from '../../../projects/services/project.service';
 import { GrupoService, Grupo } from '../../../groups/services/grupo.service';
@@ -11,7 +10,7 @@ import { ToastService } from '../../../../core/services/toast.service';
 @Component({
   selector: 'app-oportunidades-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './oportunidades.page.html',
   styleUrl: './oportunidades.page.css'
 })

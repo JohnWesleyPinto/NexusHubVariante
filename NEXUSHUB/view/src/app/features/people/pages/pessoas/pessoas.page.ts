@@ -1,7 +1,6 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { apiUrl } from '../../../../core/config/api.config';
 
@@ -22,7 +21,7 @@ export interface PessoaCardResponse {
 @Component({
   selector: 'app-pessoas-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './pessoas.page.html',
   styleUrls: ['./pessoas.page.css']
 })

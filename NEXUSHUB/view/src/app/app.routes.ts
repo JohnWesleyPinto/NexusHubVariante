@@ -1,48 +1,31 @@
 import { Routes } from '@angular/router';
-import { DashboardPageComponent } from './features/projects/pages/dashboard/dashboard.page';
-import { LoginPageComponent } from './features/auth/pages/login/login.page';
-import { CadastroPageComponent } from './features/auth/pages/cadastro/cadastro.page';
-import { EsqueciSenhaPageComponent } from './features/auth/pages/esqueci-senha/esqueci-senha.page';
-import { PerfilPageComponent } from './features/people/pages/perfil/perfil.page';
-import { ProjetoDetalhePageComponent } from './features/projects/pages/projeto-detalhe/projeto-detalhe.page';
-import { GruposPageComponent } from './features/groups/pages/grupos/grupos.page';
-import { GrupoDetalhePageComponent } from './features/groups/pages/grupo-detalhe/grupo-detalhe.page';
-import { LojaPageComponent } from './features/store/pages/loja/loja.page';
-import { AdminPageComponent } from './features/administration/pages/admin/admin.page';
-import { PrivacyPageComponent } from './features/privacy/pages/privacy/privacy.page';
-import { OnboardingPageComponent } from './features/auth/pages/onboarding/onboarding.page';
 import { onboardingGuard } from './core/auth/onboarding.guard';
 import { authGuard } from './core/auth/auth.guard';
 import { adminGuard } from './core/auth/admin.guard';
-import { ProjetosPageComponent } from './features/projects/pages/projetos/projetos.page';
-import { OportunidadesPageComponent } from './features/opportunities/pages/oportunidades/oportunidades.page';
-import { PessoasPageComponent } from './features/people/pages/pessoas/pessoas.page';
-import { TermosPrivacidadePageComponent } from './features/institutional/pages/termos-privacidade/termos-privacidade.page';
-import { SobrePageComponent } from './features/institutional/pages/sobre/sobre.page';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginPageComponent },
-  { path: 'cadastro', component: CadastroPageComponent },
-  { path: 'esqueci-senha', component: EsqueciSenhaPageComponent },
-  { path: 'onboarding', component: OnboardingPageComponent },
+  { path: 'login', loadComponent: () => import('./features/auth/pages/login/login.page').then(m => m.LoginPageComponent) },
+  { path: 'cadastro', loadComponent: () => import('./features/auth/pages/cadastro/cadastro.page').then(m => m.CadastroPageComponent) },
+  { path: 'esqueci-senha', loadComponent: () => import('./features/auth/pages/esqueci-senha/esqueci-senha.page').then(m => m.EsqueciSenhaPageComponent) },
+  { path: 'onboarding', loadComponent: () => import('./features/auth/pages/onboarding/onboarding.page').then(m => m.OnboardingPageComponent) },
   {
     path: '',
     canActivate: [onboardingGuard],
     children: [
-      { path: '', component: DashboardPageComponent },
-      { path: 'projetos', component: ProjetosPageComponent, canActivate: [authGuard] },
-      { path: 'perfil', component: PerfilPageComponent, canActivate: [authGuard] },
-      { path: 'perfil/:username', component: PerfilPageComponent, canActivate: [authGuard] },
-      { path: 'projetos/:id', component: ProjetoDetalhePageComponent, canActivate: [authGuard] },
-      { path: 'grupos', component: GruposPageComponent, canActivate: [authGuard] },
-      { path: 'grupos/:id', component: GrupoDetalhePageComponent, canActivate: [authGuard] },
-      { path: 'loja', component: LojaPageComponent, canActivate: [authGuard] },
-      { path: 'oportunidades', component: OportunidadesPageComponent, canActivate: [authGuard] },
-      { path: 'pessoas', component: PessoasPageComponent, canActivate: [authGuard] },
-      { path: 'admin', component: AdminPageComponent, canActivate: [adminGuard] },
-      { path: 'privacidade', component: PrivacyPageComponent },
-      { path: 'termos-e-privacidade', component: TermosPrivacidadePageComponent },
-      { path: 'sobre', component: SobrePageComponent }
+      { path: '', loadComponent: () => import('./features/projects/pages/dashboard/dashboard.page').then(m => m.DashboardPageComponent) },
+      { path: 'projetos', loadComponent: () => import('./features/projects/pages/projetos/projetos.page').then(m => m.ProjetosPageComponent), canActivate: [authGuard] },
+      { path: 'perfil', loadComponent: () => import('./features/people/pages/perfil/perfil.page').then(m => m.PerfilPageComponent), canActivate: [authGuard] },
+      { path: 'perfil/:username', loadComponent: () => import('./features/people/pages/perfil/perfil.page').then(m => m.PerfilPageComponent), canActivate: [authGuard] },
+      { path: 'projetos/:id', loadComponent: () => import('./features/projects/pages/projeto-detalhe/projeto-detalhe.page').then(m => m.ProjetoDetalhePageComponent), canActivate: [authGuard] },
+      { path: 'grupos', loadComponent: () => import('./features/groups/pages/grupos/grupos.page').then(m => m.GruposPageComponent), canActivate: [authGuard] },
+      { path: 'grupos/:id', loadComponent: () => import('./features/groups/pages/grupo-detalhe/grupo-detalhe.page').then(m => m.GrupoDetalhePageComponent), canActivate: [authGuard] },
+      { path: 'loja', loadComponent: () => import('./features/store/pages/loja/loja.page').then(m => m.LojaPageComponent), canActivate: [authGuard] },
+      { path: 'oportunidades', loadComponent: () => import('./features/opportunities/pages/oportunidades/oportunidades.page').then(m => m.OportunidadesPageComponent), canActivate: [authGuard] },
+      { path: 'pessoas', loadComponent: () => import('./features/people/pages/pessoas/pessoas.page').then(m => m.PessoasPageComponent), canActivate: [authGuard] },
+      { path: 'admin', loadComponent: () => import('./features/administration/pages/admin/admin.page').then(m => m.AdminPageComponent), canActivate: [adminGuard] },
+      { path: 'privacidade', loadComponent: () => import('./features/privacy/pages/privacy/privacy.page').then(m => m.PrivacyPageComponent) },
+      { path: 'termos-e-privacidade', loadComponent: () => import('./features/institutional/pages/termos-privacidade/termos-privacidade.page').then(m => m.TermosPrivacidadePageComponent) },
+      { path: 'sobre', loadComponent: () => import('./features/institutional/pages/sobre/sobre.page').then(m => m.SobrePageComponent) }
     ]
   },
   { path: '**', redirectTo: '' }
