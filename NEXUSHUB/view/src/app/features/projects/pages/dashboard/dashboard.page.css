@@ -597,47 +597,79 @@
 
     /* Dark Mode Overrides */
     body.dark-mode .card,
-    body.dark-mode .comment-bubble {
-      background: #1e293b;
-      border-color: rgba(255, 255, 255, 0.05);
+    body.dark-mode .post-card,
+    body.dark-mode .create-post-box {
+      background: #1e293b !important;
+      border-color: rgba(255, 255, 255, 0.08) !important;
+      color: #f1f5f9 !important;
     }
 
     body.dark-mode .comment-bubble {
-      background: #0f172a;
+      background: #0f172a !important;
+      border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    }
+
+    body.dark-mode .post-content,
+    body.dark-mode .author-info h5,
+    body.dark-mode .comment-text,
+    body.dark-mode .comment-header h6 {
+      color: #f1f5f9 !important;
+    }
+
+    body.dark-mode .post-time,
+    body.dark-mode .comment-time,
+    body.dark-mode .bold-hint-text {
+      color: #94a3b8 !important;
     }
 
     body.dark-mode .image-input-wrapper {
-      background: #334155;
+      background: #334155 !important;
     }
 
     body.dark-mode .create-post-header textarea,
-    body.dark-mode .comment-input-wrapper {
-      background: #0f172a;
-      border-color: #334155;
+    body.dark-mode .comment-input {
+      background: #0f172a !important;
+      border-color: #334155 !important;
+      color: #f1f5f9 !important;
     }
 
     body.dark-mode .comment-input-wrapper {
-      background: rgba(31, 122, 224, 0.05);
-      border-color: transparent;
+      background: #0f172a !important;
+      border-color: #334155 !important;
+    }
+
+    body.dark-mode .action-btn {
+      color: #94a3b8 !important;
     }
 
     body.dark-mode .action-btn:hover {
-      background: #334155;
-      color: #f8fafc;
+      background: #334155 !important;
+      color: #f8fafc !important;
     }
 
     body.dark-mode .empty-feed {
-      border-color: #334155;
+      border-color: #334155 !important;
+      color: #94a3b8 !important;
     }
 
     body.dark-mode .post-image-wrapper {
-      background: #0f172a;
-      border-color: #334155;
+      background: #0f172a !important;
+      border-color: #334155 !important;
     }
 
     body.dark-mode .mention {
-      background: rgba(31, 122, 224, 0.15);
-      color: #38bdf8;
+      background: rgba(59, 130, 246, 0.2) !important;
+      color: #60a5fa !important;
+      text-decoration: none;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    body.dark-mode .mention:hover {
+      background: rgba(59, 130, 246, 0.35) !important;
+      text-decoration: underline;
     }
 
     /* Post Category Badges */
