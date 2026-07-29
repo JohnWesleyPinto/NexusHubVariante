@@ -48,7 +48,8 @@ public class ProjectDraftAiService {
         this.model = model;
     }
 
-    public ProjectDraftResponse generate(String rawIdea) {
+    @io.opentelemetry.instrumentation.annotations.WithSpan("gerar-rascunho-projeto-ia")
+    public ProjectDraftResponse generate(@io.opentelemetry.instrumentation.annotations.SpanAttribute("projeto.ideia_raw") String rawIdea) {
         if (apiKey == null || apiKey.isBlank()) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
                     "Assistente de IA nao configurado.");

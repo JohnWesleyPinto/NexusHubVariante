@@ -89,6 +89,7 @@ public class UsuarioRestController {
     }
 
     @PostMapping("/login")
+    @io.opentelemetry.instrumentation.annotations.WithSpan("autenticar-usuario-login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         return identityService.authenticate(request.email(), request.senha())
                 .<ResponseEntity<?>>map(user -> {
