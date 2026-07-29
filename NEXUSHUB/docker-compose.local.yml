@@ -25,7 +25,7 @@ services:
     container_name: nexushub-local-backend
     restart: unless-stopped
     ports:
-      - "8085:8080"
+      - "8080:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/nexushub
       SPRING_DATASOURCE_USERNAME: nexushub
