@@ -62,6 +62,7 @@ projeto-eq01
 
 ### 5. Painel Administrativo, Auditoria e LGPD
 * **Logs de Auditoria (Conformidade LGPD)**: Rastreamento completo de eventos sensíveis (logins, alterações de senha, downloads de dados e cadastros). Sanitização avançada para não expor segredos.
+* **Módulo de Conformidade LGPD**: Gestão de consentimento do titular, portabilidade de dados em JSON e solicitação de revogação/exclusão (Documentação: [LGPD_COMPLIANCE.md](LGPD_COMPLIANCE.md)).
 * **Moderação de Denúncias**: Usuários podem denunciar postagens ou perfis. Administradores moderam as ocorrências a partir de um painel integrado.
 
 ---

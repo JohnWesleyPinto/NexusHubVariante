@@ -18,6 +18,7 @@ Para facilitar a navegação, os documentos estão agrupados por suas respectiva
 
 ### 🛍️ Produto & Especificações
 * [Visão do Produto (PRODUCT.md)](PRODUCT.md) - Definição de metas de negócio e o valor do NexusHub.
+* [Conformidade LGPD e Privacidade (LGPD_COMPLIANCE.md)](LGPD_COMPLIANCE.md) - Arquitetura de consentimento, portabilidade e direitos do titular.
 * [Casos de Uso e Requisitos (USE_CASES.md)](USE_CASES.md) - Descrição detalhada dos fluxos de sistema e lacunas mapeadas.
 * [Roadmap de Evolução (ROADMAP.md)](ROADMAP.md) - Planejamento estratégico de entregas e fases.
 
