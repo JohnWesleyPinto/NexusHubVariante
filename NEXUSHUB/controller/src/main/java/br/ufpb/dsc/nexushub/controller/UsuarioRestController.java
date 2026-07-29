@@ -110,7 +110,7 @@ public class UsuarioRestController {
 
     @GetMapping("/sessao")
     public ResponseEntity<?> sessao(java.security.Principal principal) {
-        if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (principal == null) return ResponseEntity.noContent().build();
         return ResponseEntity.ok(UsuarioResponse.from(identityService.findByEmail(principal.getName())));
     }
 
