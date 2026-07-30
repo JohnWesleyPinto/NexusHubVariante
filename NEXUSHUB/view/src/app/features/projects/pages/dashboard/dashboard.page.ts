@@ -39,10 +39,12 @@ export interface FeedPost {
   postType?: string;
 }
 
+import { NotificationBellComponent } from '../../../../shared/components/notification-bell/notification-bell.component';
+
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, RouterLink, NewProjectModalComponent, ProjectCardComponent, LoginPageComponent],
+  imports: [CommonModule, FormsModule, RouterModule, RouterLink, NewProjectModalComponent, ProjectCardComponent, LoginPageComponent, NotificationBellComponent],
   templateUrl: './dashboard.page.html',
   styleUrl: './dashboard.page.css'
 })

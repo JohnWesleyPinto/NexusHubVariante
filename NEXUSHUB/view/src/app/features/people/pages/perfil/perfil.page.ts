@@ -186,7 +186,7 @@ export class PerfilPageComponent implements OnInit {
     if (!username) return;
     this.http.get<any>(apiUrl(`/api/usuarios/perfil/${username}/seguir-status`)).subscribe({
       next: (status) => this.followStatus.set(status),
-      error: () => {}
+      error: () => { }
     });
   }
 
@@ -208,7 +208,7 @@ export class PerfilPageComponent implements OnInit {
     if (!this.isOwnProfile()) return;
     this.http.get<any[]>(apiUrl('/api/usuarios/notificacoes')).subscribe({
       next: (list) => this.notificationsList.set(list),
-      error: () => {}
+      error: () => { }
     });
   }
 
@@ -218,7 +218,7 @@ export class PerfilPageComponent implements OnInit {
         notif.read = true;
         this.loadNotifications();
       },
-      error: () => {}
+      error: () => { }
     });
   }
 
@@ -236,10 +236,10 @@ export class PerfilPageComponent implements OnInit {
     reasons.forEach((r, idx) => {
       promptMsg += `${idx + 1}. ${r}\n`;
     });
-    
+
     const choice = window.prompt(promptMsg);
     if (!choice) return;
-    
+
     let reason = '';
     const choiceNum = parseInt(choice.trim(), 10);
     if (choiceNum >= 1 && choiceNum <= 3) {
@@ -280,10 +280,10 @@ export class PerfilPageComponent implements OnInit {
     reasons.forEach((r, idx) => {
       promptMsg += `${idx + 1}. ${r}\n`;
     });
-    
+
     const choice = window.prompt(promptMsg);
     if (!choice) return;
-    
+
     let reason = '';
     const choiceNum = parseInt(choice.trim(), 10);
     if (choiceNum >= 1 && choiceNum <= 3) {
@@ -327,14 +327,14 @@ export class PerfilPageComponent implements OnInit {
     // Load Accepted Testimonials
     this.http.get<any[]>(apiUrl(`/api/usuarios/perfil/${user.username}/depoimentos`)).subscribe({
       next: (list) => this.testimonials.set(list),
-      error: () => {}
+      error: () => { }
     });
 
     // Load Pending Testimonials if own profile
     if (this.isOwnProfile()) {
       this.http.get<any[]>(apiUrl('/api/usuarios/perfil/depoimentos/pendentes')).subscribe({
         next: (list) => this.pendingTestimonials.set(list),
-        error: () => {}
+        error: () => { }
       });
     } else {
       this.pendingTestimonials.set([]);
@@ -346,7 +346,7 @@ export class PerfilPageComponent implements OnInit {
       next: (techs) => {
         this.allTechnologiesSuggestions = techs;
       },
-      error: () => {}
+      error: () => { }
     });
   }
 
@@ -453,7 +453,7 @@ export class PerfilPageComponent implements OnInit {
       this.editFotoUrl = user.fotoUrl || '';
       this.editBio = user.bio || '';
       this.usernameStatus.set('current');
-      
+
       if (user.birthDate) {
         const parts = user.birthDate.split('-');
         if (parts.length === 3) {
@@ -592,7 +592,7 @@ export class PerfilPageComponent implements OnInit {
   formatWhatsapp(event: any) {
     let value = event.target.value.replace(/\D/g, '');
     if (value.length > 11) value = value.substring(0, 11);
-    
+
     if (value.length > 6) {
       value = `(${value.substring(0, 2)}) ${value.substring(2, 7)}-${value.substring(7)}`;
     } else if (value.length > 2) {
@@ -606,7 +606,7 @@ export class PerfilPageComponent implements OnInit {
   onEditBirthDateInput(event: Event) {
     let value = (event.target as HTMLInputElement).value.replace(/\D/g, '');
     if (value.length > 8) value = value.slice(0, 8);
-    
+
     if (value.length >= 5) {
       this.editBirthDateInput = `${value.slice(0, 2)}/${value.slice(2, 4)}/${value.slice(4)}`;
     } else if (value.length >= 3) {
@@ -631,7 +631,7 @@ export class PerfilPageComponent implements OnInit {
   getFilteredSuggestions(): string[] {
     const term = this.newTechInput.trim().toLowerCase();
     if (!term) return [];
-    return this.allTechnologiesSuggestions.filter(t => 
+    return this.allTechnologiesSuggestions.filter(t =>
       t.toLowerCase().includes(term) && !this.editTechnologies.includes(t)
     );
   }
@@ -639,8 +639,8 @@ export class PerfilPageComponent implements OnInit {
   getSuggestedCompetenciesForCourse(): string[] {
     const course = this.editCourse;
     if (!course) return [];
-    
-    const mapKey = Object.keys(COURSE_COMPETENCIES_MAP).find(k => 
+
+    const mapKey = Object.keys(COURSE_COMPETENCIES_MAP).find(k =>
       k.toLowerCase() === course.toLowerCase() || course.toLowerCase().includes(k.toLowerCase())
     );
 
@@ -655,20 +655,83 @@ export class PerfilPageComponent implements OnInit {
     this.isSaving.set(true);
     this.editError.set('');
 
+    const missingFields: string[] = [];
+
+    // 1. Dados Pessoais
+    if (!this.editUsername || !this.editUsername.trim()) {
+      missingFields.push('Username (@)');
+    }
+    if (!this.editNome || !this.editNome.trim()) {
+      missingFields.push('Nome Completo');
+    }
+    if (!this.editEmail || !this.editEmail.trim()) {
+      missingFields.push('E-mail Acadêmico');
+    }
+    if (this.editGenderType == 3 && (!this.editGenderOther || !this.editGenderOther.trim())) {
+      missingFields.push('Especificação de Gênero');
+    }
+
+    // Se houver erros nos dados pessoais, navega para a aba Pessoais
+    if (missingFields.length > 0) {
+      this.editTopicTab.set('pessoais');
+      const msg = `Para salvar o perfil, preencha os seguintes campos obrigatórios: ${missingFields.join(', ')}.`;
+      this.editError.set(msg);
+      this.toastService.show(msg, 'error');
+      this.isSaving.set(false);
+      return;
+    }
+
+    // 2. Dados Acadêmicos
+    if (!this.editCourse || !this.editCourse.trim()) {
+      missingFields.push('Curso');
+    }
+    if (!this.editPeriod || !this.editPeriod.trim()) {
+      missingFields.push('Período Atual');
+    }
+
+    // Se houver erros nos dados acadêmicos, navega para a aba Acadêmicos
+    if (missingFields.length > 0) {
+      this.editTopicTab.set('academicos');
+      const msg = `Para salvar o perfil, preencha os seguintes campos acadêmicos obrigatórios: ${missingFields.join(', ')}.`;
+      this.editError.set(msg);
+      this.toastService.show(msg, 'error');
+      this.isSaving.set(false);
+      return;
+    }
+
+    // Validação da senha caso tenha digitado algo
+    if (this.editSenha && this.editSenha.trim().length > 0 && this.editSenha.trim().length < 6) {
+      this.editTopicTab.set('configuracoes');
+      const msg = 'A nova senha deve ter pelo menos 6 caracteres (ou deixe em branco para manter a atual).';
+      this.editError.set(msg);
+      this.toastService.show(msg, 'error');
+      this.isSaving.set(false);
+      return;
+    }
+
     if (this.usernameStatus() === 'taken') {
-      this.toastService.show('O username escolhido já está em uso por outro usuário.', 'error');
+      this.editTopicTab.set('pessoais');
+      const msg = 'O username escolhido já está em uso por outro perfil. Por favor, escolha outro.';
+      this.editError.set(msg);
+      this.toastService.show(msg, 'error');
       this.isSaving.set(false);
       return;
     }
 
     const periodPattern = /^\d{4}\.[12]$/;
     if (this.editIngressPeriod && !periodPattern.test(this.editIngressPeriod)) {
-      this.toastService.show('O período de ingresso deve estar no formato YYYY.Semestre (ex: 2024.1)', 'error');
+      this.editTopicTab.set('academicos');
+      const msg = 'O período de ingresso deve estar no formato YYYY.Semestre (ex: 2024.1)';
+      this.editError.set(msg);
+      this.toastService.show(msg, 'error');
       this.isSaving.set(false);
       return;
     }
     if (this.editConclusionPeriod && !periodPattern.test(this.editConclusionPeriod)) {
-      this.toastService.show('O período de conclusão deve estar no formato YYYY.Semestre (ex: 2026.2)', 'error');
+      this.editTopicTab.set('academicos');
+      const msg = 'O período de conclusão deve estar no formato YYYY.Semestre (ex: 2026.2)';
+      this.editError.set(msg);
+      this.toastService.show(msg, 'error');
       this.isSaving.set(false);
       return;
     }
@@ -785,7 +848,7 @@ export class PerfilPageComponent implements OnInit {
         post.likedByCurrentUser = res.liked;
         post.likesCount += res.liked ? 1 : -1;
       },
-      error: () => {}
+      error: () => { }
     });
   }
 
@@ -801,7 +864,7 @@ export class PerfilPageComponent implements OnInit {
           post.comments = [...post.comments, newComment];
         }
       },
-      error: () => {}
+      error: () => { }
     });
   }
 

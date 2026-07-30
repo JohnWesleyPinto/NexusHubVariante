@@ -2,8 +2,8 @@
       <div class="auth-card">
         <header class="auth-header">
           <span class="logo-badge">N</span>
-          <h2>Esqueceu sua senha?</h2>
-          <p>Digite seu e-mail cadastrado e insira sua nova senha de acesso</p>
+          <h2>{{ token() ? 'Cadastrar Nova Senha' : 'Recuperar Senha' }}</h2>
+          <p>{{ token() ? 'Insira e confirme sua nova senha de acesso' : 'Informe seu e-mail para receber um link seguro com token único de redefinição' }}</p>
         </header>
 
         <div class="alert alert-danger" *ngIf="errorMessage()">
@@ -15,7 +15,8 @@
         </div>
 
         <form (ngSubmit)="onSubmit()" #forgotForm="ngForm" *ngIf="!successMessage()">
-          <div class="form-group">
+          <!-- Campo E-mail (Exibido se NÃO houver token na URL) -->
+          <div class="form-group" *ngIf="!token()">
             <label for="email">E-mail Acadêmico Cadastrado</label>
             <input 
               type="email" 
@@ -24,13 +25,14 @@
               [(ngModel)]="email" 
               required 
               email
-              placeholder="Ex: rodrigo@nexushub.com" 
+              placeholder="Ex: usuario@nexushub.ufpb.br" 
               #emailInput="ngModel"
             />
             <span class="error-msg" *ngIf="emailInput.invalid && emailInput.touched">Insira um e-mail válido.</span>
           </div>
 
-          <div class="form-group">
+          <!-- Campo Nova Senha (Exibido apenas quando HOUVER token na URL) -->
+          <div class="form-group" *ngIf="token()">
             <label for="novaSenha">Nova Senha</label>
             <input 
               type="password" 
@@ -39,19 +41,19 @@
               [(ngModel)]="novaSenha" 
               required 
               minlength="6"
-              placeholder="Digite a nova senha (mínimo 6 dígitos)"
+              placeholder="Digite sua nova senha (mínimo 6 caracteres)"
               #senhaInput="ngModel"
             />
             <span class="error-msg" *ngIf="senhaInput.invalid && senhaInput.touched">A senha deve ter pelo menos 6 caracteres.</span>
           </div>
 
           <button type="submit" class="btn btn-primary w-full" [disabled]="forgotForm.invalid || isLoading()">
-            {{ isLoading() ? 'Redefinindo...' : 'Atualizar Senha' }}
+            {{ isLoading() ? 'Processando...' : (token() ? 'Salvar Nova Senha' : 'Enviar Link de Redefinição') }}
           </button>
         </form>
 
         <div class="success-actions animate-fade-in" *ngIf="successMessage()">
-          <button class="btn btn-primary w-full" routerLink="/login">Fazer Login agora</button>
+          <button class="btn btn-primary w-full" routerLink="/login">Ir para a Tela de Login</button>
         </div>
 
         <footer class="auth-footer" *ngIf="!successMessage()">

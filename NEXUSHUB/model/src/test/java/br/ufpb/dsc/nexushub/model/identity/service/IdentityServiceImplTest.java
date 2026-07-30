@@ -8,6 +8,7 @@ import br.ufpb.dsc.nexushub.model.identity.repository.*;
 import br.ufpb.dsc.nexushub.model.identity.service.impl.IdentityServiceImpl;
 import br.ufpb.dsc.nexushub.model.people.domain.Human;
 import br.ufpb.dsc.nexushub.model.people.repository.HumanRepository;
+import br.ufpb.dsc.nexushub.model.people.repository.TechnologyRepository;
 import java.util.*;
 import org.junit.jupiter.api.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,9 +19,9 @@ class IdentityServiceImplTest {
     RoleRepository roles = mock(RoleRepository.class);
     HumanRepository humans = mock(HumanRepository.class);
     PasswordEncoder encoder = mock(PasswordEncoder.class);
-    br.ufpb.dsc.nexushub.model.people.repository.TechnologyRepository technologies = 
-            mock(br.ufpb.dsc.nexushub.model.people.repository.TechnologyRepository.class);
-    IdentityServiceImpl service = new IdentityServiceImpl(users, roles, humans, encoder, technologies);
+    TechnologyRepository technologies = mock(TechnologyRepository.class);
+    PasswordResetTokenRepository tokenRepository = mock(PasswordResetTokenRepository.class);
+    IdentityServiceImpl service = new IdentityServiceImpl(users, roles, humans, encoder, technologies, tokenRepository);
 
     @BeforeEach
     void saves() {

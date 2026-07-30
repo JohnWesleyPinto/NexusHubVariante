@@ -65,9 +65,12 @@
       <span></span>
     </button>
     <span class="mobile-brand-title">NEXUS<span>HUB</span></span>
-    <div class="mobile-profile-pic" routerLink="/perfil" (click)="closeMobileMenu()">
-      <img *ngIf="currentUser()?.fotoUrl" [src]="currentUser()?.fotoUrl" alt="Perfil" />
-      <span *ngIf="!currentUser()?.fotoUrl" class="mobile-initials">{{ currentUser()?.nome?.charAt(0) }}</span>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <app-notification-bell></app-notification-bell>
+      <div class="mobile-profile-pic" routerLink="/perfil" (click)="closeMobileMenu()">
+        <img *ngIf="currentUser()?.fotoUrl" [src]="currentUser()?.fotoUrl" alt="Perfil" />
+        <span *ngIf="!currentUser()?.fotoUrl" class="mobile-initials">{{ currentUser()?.nome?.charAt(0) }}</span>
+      </div>
     </div>
   </div>
 
@@ -252,6 +255,9 @@
       </div>
 
       <div class="footer-actions">
+        <!-- Notification Bell -->
+        <app-notification-bell></app-notification-bell>
+
         <!-- Edit Profile shortcut -->
         <a class="sidebar-footer-btn" routerLink="/perfil" title="Editar Perfil" (click)="closeMobileMenu()">
           <span class="material-symbols-rounded footer-icon">manage_accounts</span>

@@ -11,6 +11,7 @@ import br.ufpb.dsc.nexushub.model.people.domain.Post;
 import br.ufpb.dsc.nexushub.model.people.repository.HumanRepository;
 import br.ufpb.dsc.nexushub.model.people.repository.NotificationRepository;
 import br.ufpb.dsc.nexushub.model.people.repository.PostRepository;
+import br.ufpb.dsc.nexushub.model.people.service.NotificationService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -36,7 +37,7 @@ public class ModerationRestController {
     private final IdentityService identityService;
     private final PostRepository postRepository;
     private final AdministrationService administrationService;
-    private final NotificationRepository notificationRepository;
+    private final NotificationService notificationService;
     private final HumanRepository humanRepository;
 
     public ModerationRestController(
@@ -44,14 +45,14 @@ public class ModerationRestController {
             IdentityService identityService,
             PostRepository postRepository,
             AdministrationService administrationService,
-            NotificationRepository notificationRepository,
+            NotificationService notificationService,
             HumanRepository humanRepository
     ) {
         this.moderationCaseRepository = moderationCaseRepository;
         this.identityService = identityService;
         this.postRepository = postRepository;
         this.administrationService = administrationService;
-        this.notificationRepository = notificationRepository;
+        this.notificationService = notificationService;
         this.humanRepository = humanRepository;
     }
 
@@ -139,14 +140,22 @@ public class ModerationRestController {
 
         // Notify the reporter
         String targetName = "POST".equals(mc.getTargetType()) ? "publicação" : "perfil de usuário";
+        String notificationTitle = "Atualização sobre sua denúncia";
         String notificationMessage;
         if ("APPROVED".equals(decision)) {
-            notificationMessage = "Sua denúncia contra um(a) " + targetName + " foi analisada e aceita. O conteúdo foi removido/bloqueado.";
+            notificationMessage = "Sua denúncia contra um(a) " + targetName + " foi analisada e aceita. O conteúdo foi moderado.";
         } else {
-            notificationMessage = "Sua denúncia contra um(a) " + targetName + " foi analisada e rejeitada. O conteúdo foi mantido.";
+            notificationMessage = "Sua denúncia contra um(a) " + targetName + " foi analisada e concluída.";
         }
 
-        notificationRepository.save(new Notification(mc.getReporter(), notificationMessage));
+        notificationService.createNotification(
+                mc.getReporter().getId(),
+                notificationTitle,
+                notificationMessage,
+                "SYSTEM_NOTICE",
+                null,
+                true
+        );
 
         return ResponseEntity.ok(new MessageResponse("Decisão registrada e denunciante notificado."));
     }

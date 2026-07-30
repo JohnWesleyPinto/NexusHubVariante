@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, RouterOutlet } from '@angular/router';
 import { AuthService } from './core/auth/auth.service';
 import { FooterComponent } from './shared/components/footer/footer.component';
+import { NotificationBellComponent } from './shared/components/notification-bell/notification-bell.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterModule, RouterOutlet, FooterComponent],
+  imports: [CommonModule, RouterModule, RouterOutlet, FooterComponent, NotificationBellComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

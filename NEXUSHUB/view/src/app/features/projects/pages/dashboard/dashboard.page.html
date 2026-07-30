@@ -58,11 +58,14 @@
             </div>
           </div>
 
-          <!-- Create button -->
-          <button class="btn-create-proj-modern" (click)="openCreateModal()">
-            <span class="material-symbols-rounded plus-icon">add</span>
-            Novo Projeto
-          </button>
+          <!-- Notification Bell & New Project Button -->
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <app-notification-bell></app-notification-bell>
+            <button class="btn-create-proj-modern" (click)="openCreateModal()">
+              <span class="material-symbols-rounded plus-icon">add</span>
+              Novo Projeto
+            </button>
+          </div>
         </header>
 
         <!-- Create Post Box (Mockup style) -->

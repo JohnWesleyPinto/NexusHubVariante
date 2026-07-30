@@ -1,0 +1,76 @@
+<div class="notification-bell-wrapper">
+  <!-- Botão do Sininho -->
+  <button 
+    class="bell-btn" 
+    (click)="toggleDropdown($event)" 
+    [class.active]="isOpen()"
+    title="Notificações"
+    aria-label="Abrir Notificações"
+  >
+    <span class="material-symbols-rounded bell-icon">notifications</span>
+    
+    <!-- Badge Contador Vermelho -->
+    <span class="unread-badge animate-pulse" *ngIf="notificationService.unreadCount() > 0">
+      {{ notificationService.unreadCount() > 99 ? '99+' : notificationService.unreadCount() }}
+    </span>
+  </button>
+
+  <!-- Dropdown de Notificações -->
+  <div class="notification-dropdown animate-scale-in" *ngIf="isOpen()">
+    <!-- Header do Dropdown -->
+    <header class="dropdown-header">
+      <div class="header-title-group">
+        <h4>Notificações</h4>
+        <span class="count-pill" *ngIf="notificationService.unreadCount() > 0">
+          {{ notificationService.unreadCount() }} não lida{{ notificationService.unreadCount() > 1 ? 's' : '' }}
+        </span>
+      </div>
+      <button 
+        class="mark-all-btn" 
+        *ngIf="notificationService.unreadCount() > 0"
+        (click)="onMarkAllAsRead($event)"
+        title="Marcar todas como lidas"
+      >
+        <span class="material-symbols-rounded icon">done_all</span>
+        Marcar todas lidas
+      </button>
+    </header>
+
+    <!-- Lista com Scroll -->
+    <div class="notifications-list">
+      <ng-container *ngIf="notificationService.notifications().length > 0; else emptyState">
+        <div 
+          class="notification-item" 
+          *ngFor="let item of notificationService.notifications()"
+          [class.unread]="!item.isRead"
+          (click)="onNotificationClick(item)"
+        >
+          <!-- Ícone do Tipo -->
+          <div class="item-icon-wrapper" [attr.data-type]="item.type">
+            <span class="material-symbols-rounded">{{ getIconForType(item.type) }}</span>
+          </div>
+
+          <!-- Conteúdo -->
+          <div class="item-content">
+            <div class="item-top">
+              <h5 class="item-title">{{ item.title }}</h5>
+              <span class="item-time">{{ getRelativeTime(item.createdAt) }}</span>
+            </div>
+            <p class="item-message">{{ item.message }}</p>
+          </div>
+
+          <!-- Ponto Indicador Não Lida -->
+          <div class="unread-indicator" *ngIf="!item.isRead"></div>
+        </div>
+      </ng-container>
+
+      <ng-template #emptyState>
+        <div class="empty-notifications">
+          <span class="material-symbols-rounded empty-icon">notifications_off</span>
+          <p>Nenhuma notificação por aqui!</p>
+          <span class="empty-sub">Você está em dia com todas as novidades.</span>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

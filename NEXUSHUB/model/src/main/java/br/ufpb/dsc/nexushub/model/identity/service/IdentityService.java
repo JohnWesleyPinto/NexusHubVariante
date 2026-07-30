@@ -16,6 +16,10 @@ public interface IdentityService {
 
     void changePasswordByEmail(String email, String rawPassword);
 
+    String createPasswordResetToken(String email);
+
+    void resetPasswordWithToken(String token, String newPassword);
+
     User updateUserProfile(UUID userId, String name, String email, String rawPassword, String fotoUrl);
 
     User completeOnboarding(UUID userId, String nome, java.time.LocalDate birthDate, boolean showBirthday, String course, String period, String username);

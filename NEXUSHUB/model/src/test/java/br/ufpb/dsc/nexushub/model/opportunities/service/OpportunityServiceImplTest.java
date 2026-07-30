@@ -12,6 +12,7 @@ import br.ufpb.dsc.nexushub.model.opportunities.service.impl.OpportunityServiceI
 import br.ufpb.dsc.nexushub.model.people.domain.Human;
 import br.ufpb.dsc.nexushub.model.people.repository.HumanRepository;
 import br.ufpb.dsc.nexushub.model.projects.repository.ProjectRepository;
+import br.ufpb.dsc.nexushub.model.people.service.NotificationService;
 import java.util.*;
 import org.junit.jupiter.api.Test;
 
@@ -27,6 +28,7 @@ class OpportunityServiceImplTest {
     OpportunityOptionRepository options = mock(OpportunityOptionRepository.class);
     OpportunityAnswerRepository answers = mock(OpportunityAnswerRepository.class);
     ReportTicketRepository tickets = mock(ReportTicketRepository.class);
+    NotificationService notifications = mock(NotificationService.class);
 
     OpportunityServiceImpl service = new OpportunityServiceImpl(
             opportunities,
@@ -38,7 +40,8 @@ class OpportunityServiceImplTest {
             questions,
             options,
             answers,
-            tickets
+            tickets,
+            notifications
     );
 
     @Test

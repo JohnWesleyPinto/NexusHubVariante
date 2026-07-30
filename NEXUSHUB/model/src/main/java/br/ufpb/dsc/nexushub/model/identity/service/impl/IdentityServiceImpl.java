@@ -13,6 +13,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.ufpb.dsc.nexushub.model.identity.domain.PasswordResetToken;
+import br.ufpb.dsc.nexushub.model.identity.repository.PasswordResetTokenRepository;
+import br.ufpb.dsc.nexushub.model.identity.repository.RoleRepository;
+import br.ufpb.dsc.nexushub.model.identity.repository.UserRepository;
+import br.ufpb.dsc.nexushub.model.identity.service.IdentityService;
+import br.ufpb.dsc.nexushub.model.people.domain.Human;
+import br.ufpb.dsc.nexushub.model.people.repository.HumanRepository;
+import java.util.Optional;
+import java.util.UUID;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
 public class IdentityServiceImpl implements IdentityService {
 
@@ -21,19 +34,22 @@ public class IdentityServiceImpl implements IdentityService {
     private final HumanRepository humanRepository;
     private final PasswordEncoder passwordEncoder;
     private final br.ufpb.dsc.nexushub.model.people.repository.TechnologyRepository technologyRepository;
+    private final PasswordResetTokenRepository tokenRepository;
 
     public IdentityServiceImpl(
             UserRepository userRepository,
             RoleRepository roleRepository,
             HumanRepository humanRepository,
             PasswordEncoder passwordEncoder,
-            br.ufpb.dsc.nexushub.model.people.repository.TechnologyRepository technologyRepository
+            br.ufpb.dsc.nexushub.model.people.repository.TechnologyRepository technologyRepository,
+            PasswordResetTokenRepository tokenRepository
     ) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.humanRepository = humanRepository;
         this.passwordEncoder = passwordEncoder;
         this.technologyRepository = technologyRepository;
+        this.tokenRepository = tokenRepository;
     }
 
     @Override
@@ -109,6 +125,40 @@ public class IdentityServiceImpl implements IdentityService {
         User user = userRepository.findByEmail(normalizeEmail(email))
                 .orElseThrow(() -> new IllegalArgumentException("Nenhum usuario cadastrado com este e-mail."));
         changePassword(user.getId(), rawPassword, user.getId());
+    }
+
+    @Override
+    @Transactional
+    public String createPasswordResetToken(String email) {
+        User user = userRepository.findByEmail(normalizeEmail(email))
+                .orElseThrow(() -> new IllegalArgumentException("Nenhum usuário cadastrado com este e-mail."));
+
+        String token = UUID.randomUUID().toString().replace("-", "");
+        PasswordResetToken resetToken = new PasswordResetToken(user, token, 30); // 30 minutos de expiração
+        tokenRepository.save(resetToken);
+        return token;
+    }
+
+    @Override
+    @Transactional
+    public void resetPasswordWithToken(String token, String newPassword) {
+        if (newPassword == null || newPassword.trim().length() < 6) {
+            throw new IllegalArgumentException("A nova senha deve possuir pelo menos 6 caracteres.");
+        }
+
+        PasswordResetToken resetToken = tokenRepository.findByToken(token.trim())
+                .orElseThrow(() -> new IllegalArgumentException("Token de redefinição inválido ou não encontrado."));
+
+        if (!resetToken.isValid()) {
+            throw new IllegalArgumentException("Este token de redefinição já foi utilizado ou expirou.");
+        }
+
+        User user = resetToken.getUser();
+        user.changePassword(passwordEncoder.encode(newPassword.trim()), user.getId());
+        userRepository.save(user);
+
+        resetToken.markUsed();
+        tokenRepository.save(resetToken);
     }
 
     @Override

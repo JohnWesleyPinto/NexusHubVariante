@@ -10,6 +10,7 @@ import br.ufpb.dsc.nexushub.model.marketplace.repository.ShopRepository;
 import br.ufpb.dsc.nexushub.model.marketplace.service.MarketplaceService;
 import br.ufpb.dsc.nexushub.model.people.domain.Human;
 import br.ufpb.dsc.nexushub.model.people.repository.HumanRepository;
+import br.ufpb.dsc.nexushub.model.people.service.NotificationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,15 +26,18 @@ public class MarketplaceServiceImpl implements MarketplaceService {
     private final ProductRepository productRepository;
     private final ProductMetricRepository productMetricRepository;
     private final HumanRepository humanRepository;
+    private final NotificationService notificationService;
 
     public MarketplaceServiceImpl(ShopRepository shopRepository,
                                   ProductRepository productRepository,
                                   ProductMetricRepository productMetricRepository,
-                                  HumanRepository humanRepository) {
+                                  HumanRepository humanRepository,
+                                  NotificationService notificationService) {
         this.shopRepository = shopRepository;
         this.productRepository = productRepository;
         this.productMetricRepository = productMetricRepository;
         this.humanRepository = humanRepository;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -121,6 +125,31 @@ public class MarketplaceServiceImpl implements MarketplaceService {
         metric.touch(userId);
         productMetricRepository.save(metric);
 
+        // Disparo de evento: Notificar vendedor se a loja estiver inativa
+        if (shop != null && !shop.isActive()) {
+            notificationService.createNotification(
+                    sellerId,
+                    "Atenção: Sua Loja está Inativa! ⚠️",
+                    "Você publicou o item '" + saved.getTitle() + "', mas sua lojinha está desativada no momento. Clique para reativá-la.",
+                    "STORE_REMINDER",
+                    "/loja",
+                    false
+            );
+        }
+
+        // Disparo de evento: Notificar usuários sobre novo anúncio
+        humanRepository.findAll().stream()
+                .filter(h -> h.getRecordStatus() == 1 && !h.getId().equals(sellerId))
+                .limit(15)
+                .forEach(h -> notificationService.createNotification(
+                        h.getId(),
+                        "Novo Item Anunciado na Lojinha! 🛍️",
+                        seller.getName() + " anunciou '" + saved.getTitle() + "'.",
+                        "STORE_REMINDER",
+                        "/loja",
+                        false
+                ));
+
         return ProductResponse.from(saved, metric);
     }
 
@@ -180,7 +209,23 @@ public class MarketplaceServiceImpl implements MarketplaceService {
                 });
         metric.incrementViews();
         metric.touch(userId);
-        productMetricRepository.save(metric);
+        ProductMetric savedMetric = productMetricRepository.save(metric);
+
+        // Disparo de evento: Notificar vendedor ao atingir marcos de visualizações
+        long views = savedMetric.getViews();
+        if (views == 10 || views == 50 || views == 100) {
+            Product p = savedMetric.getProduct();
+            if (p != null && p.getSeller() != null) {
+                notificationService.createNotification(
+                        p.getSeller().getId(),
+                        "Seu produto atingiu " + views + " visualizações! 📈",
+                        "O item '" + p.getTitle() + "' está despertando grande interesse no campus.",
+                        "STORE_METRIC",
+                        "/loja",
+                        false
+                );
+            }
+        }
     }
 
     @Override

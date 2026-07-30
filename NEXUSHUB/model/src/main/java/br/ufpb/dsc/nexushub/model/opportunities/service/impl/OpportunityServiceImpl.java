@@ -12,6 +12,7 @@ import br.ufpb.dsc.nexushub.model.people.domain.Human;
 import br.ufpb.dsc.nexushub.model.people.repository.HumanRepository;
 import br.ufpb.dsc.nexushub.model.projects.domain.Project;
 import br.ufpb.dsc.nexushub.model.projects.repository.ProjectRepository;
+import br.ufpb.dsc.nexushub.model.people.service.NotificationService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -32,6 +33,7 @@ public class OpportunityServiceImpl implements OpportunityService {
     private final OpportunityOptionRepository optionRepository;
     private final OpportunityAnswerRepository answerRepository;
     private final ReportTicketRepository reportTicketRepository;
+    private final NotificationService notificationService;
 
     public OpportunityServiceImpl(
             OpportunityRepository opportunityRepository,
@@ -43,7 +45,8 @@ public class OpportunityServiceImpl implements OpportunityService {
             OpportunityQuestionRepository questionRepository,
             OpportunityOptionRepository optionRepository,
             OpportunityAnswerRepository answerRepository,
-            ReportTicketRepository reportTicketRepository
+            ReportTicketRepository reportTicketRepository,
+            NotificationService notificationService
     ) {
         this.opportunityRepository = opportunityRepository;
         this.applicationRepository = applicationRepository;
@@ -55,6 +58,7 @@ public class OpportunityServiceImpl implements OpportunityService {
         this.optionRepository = optionRepository;
         this.answerRepository = answerRepository;
         this.reportTicketRepository = reportTicketRepository;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -104,6 +108,24 @@ public class OpportunityServiceImpl implements OpportunityService {
 
         if (request.usaFormulario() && request.perguntas() != null && !request.perguntas().isEmpty()) {
             saveFormStructure(savedO, request.perguntas(), updatedById);
+        }
+
+        // Disparo de evento: Se for oportunidade publicada por Professor ou com Bolsa, notifica alunos interessados
+        if ("PROFESSOR".equalsIgnoreCase(publisher.getUserType()) || Boolean.TRUE.equals(request.pago())) {
+            List<Human> students = humanRepository.findAll().stream()
+                    .filter(h -> h.getRecordStatus() == 1 && !"PROFESSOR".equalsIgnoreCase(h.getUserType()) && !h.getId().equals(publisherHumanId))
+                    .limit(20)
+                    .toList();
+            for (Human student : students) {
+                notificationService.createNotification(
+                        student.getId(),
+                        "Nova Vaga / Bolsa Acadêmica!",
+                        publisher.getName() + " publicou a oportunidade '" + savedO.getName() + "'.",
+                        "OPPORTUNITY_NEW",
+                        "/oportunidades",
+                        true
+                );
+            }
         }
 
         return savedO;
@@ -209,6 +231,19 @@ public class OpportunityServiceImpl implements OpportunityService {
                 updatedById
         );
         OpportunityApplication savedApp = applicationRepository.save(app);
+
+        // Disparo de evento: Notificar criador da oportunidade sobre nova candidatura
+        Human creator = opportunity.getPublisher();
+        if (creator != null && !creator.getId().equals(humanId)) {
+            notificationService.createNotification(
+                    creator.getId(),
+                    "Nova Candidatura Recebida!",
+                    human.getName() + " candidatou-se à oportunidade '" + opportunity.getName() + "'.",
+                    "OPPORTUNITY_APPLICATION",
+                    "/oportunidades",
+                    true
+            );
+        }
 
         if (opportunity.isUseForm()) {
             OpportunityForm form = formRepository.findByOpportunityIdAndRecordStatus(opportunity.getId(), 1)

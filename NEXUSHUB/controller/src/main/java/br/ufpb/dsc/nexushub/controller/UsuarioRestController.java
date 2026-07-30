@@ -7,6 +7,7 @@ import br.ufpb.dsc.nexushub.model.dto.UsuarioResponse;
 import br.ufpb.dsc.nexushub.model.administration.service.AuditService;
 import br.ufpb.dsc.nexushub.model.identity.domain.User;
 import br.ufpb.dsc.nexushub.model.identity.service.IdentityService;
+import br.ufpb.dsc.nexushub.model.shared.service.EmailService;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import java.util.List;
@@ -43,9 +44,11 @@ public class UsuarioRestController {
     private final br.ufpb.dsc.nexushub.model.people.repository.HumanRepository humanRepository;
     private final br.ufpb.dsc.nexushub.model.projects.repository.ProjectHumanMemberRepository projectHumanMemberRepository;
     private final br.ufpb.dsc.nexushub.model.identity.repository.UserRepository userRepository;
+    private final EmailService emailService;
     private final String googleClientId;
 
-    public UsuarioRestController(IdentityService identityService, AuditService auditService, 
+    public UsuarioRestController(IdentityService identityService, 
+                                 AuditService auditService, 
                                  br.ufpb.dsc.nexushub.model.people.repository.TechnologyRepository technologyRepository,
                                  br.ufpb.dsc.nexushub.model.people.service.FeedService feedService,
                                  br.ufpb.dsc.nexushub.model.people.repository.TestimonialRepository testimonialRepository,
@@ -55,6 +58,7 @@ public class UsuarioRestController {
                                  br.ufpb.dsc.nexushub.model.people.repository.HumanRepository humanRepository,
                                  br.ufpb.dsc.nexushub.model.projects.repository.ProjectHumanMemberRepository projectHumanMemberRepository,
                                  br.ufpb.dsc.nexushub.model.identity.repository.UserRepository userRepository,
+                                 EmailService emailService,
                                  @Value("${app.google.client-id}") String googleClientId) {
         this.identityService = identityService;
         this.auditService = auditService;
@@ -67,6 +71,7 @@ public class UsuarioRestController {
         this.humanRepository = humanRepository;
         this.projectHumanMemberRepository = projectHumanMemberRepository;
         this.userRepository = userRepository;
+        this.emailService = emailService;
         this.googleClientId = googleClientId;
     }
 
@@ -82,6 +87,19 @@ public class UsuarioRestController {
             User user = identityService.registerUser(request.nome(), request.email(), request.senha(), request.cargo(), request.fotoUrl());
             privacyService.consent(user.getId(), "TERMS_AND_PRIVACY", "1.0", true);
             audit(user.getId(), "USER_REGISTERED", user.getId().toString(), "SUCCESS", httpRequest, "role=" + user.getRole().getName());
+            
+            // Disparo de evento: Boas-vindas e incentivo ao Onboarding/Perfil
+            if (notificationRepository != null && user.getHuman() != null) {
+                notificationRepository.save(new br.ufpb.dsc.nexushub.model.people.domain.Notification(
+                        user.getHuman(),
+                        "Bem-vindo(a) ao NexusHub! 🎉",
+                        "Preencha seu perfil para conectar-se com outros estudantes e projetos da UFPB.",
+                        "SYSTEM_NOTICE",
+                        "/perfil",
+                        false
+                ));
+            }
+
             return ResponseEntity.status(HttpStatus.CREATED).body(UsuarioResponse.from(user));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorDto(e.getMessage()));
@@ -115,11 +133,44 @@ public class UsuarioRestController {
         return ResponseEntity.ok(UsuarioResponse.from(identityService.findByEmail(principal.getName())));
     }
 
+    @PostMapping("/solicitar-codigo-recuperacao")
+    public ResponseEntity<?> solicitarCodigoRecuperacao(@RequestBody ForgotPasswordRequest request, HttpServletRequest httpRequest) {
+        try {
+            String resetToken = identityService.createPasswordResetToken(request.email());
+            User user = identityService.findByEmail(request.email());
+            String name = user.getHuman() != null ? user.getHuman().getName() : "Usuário";
+            
+            emailService.sendPasswordResetEmail(user.getEmail(), name, resetToken);
+            audit(user.getId(), "PASSWORD_RESET_REQUESTED", user.getId().toString(), "SUCCESS", httpRequest, null);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorDto(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/redefinir-senha-token")
+    public ResponseEntity<?> redefinirComToken(@RequestBody ResetPasswordWithTokenRequest request, HttpServletRequest httpRequest) {
+        try {
+            identityService.resetPasswordWithToken(request.token(), request.novaSenha());
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorDto(e.getMessage()));
+        }
+    }
+
     @PostMapping("/esqueci-senha")
     public ResponseEntity<?> redefinirSenha(@Valid @RequestBody ForgotPasswordRequest request, HttpServletRequest httpRequest) {
         try {
-            identityService.changePasswordByEmail(request.email(), request.novaSenha());
+            String resetToken = identityService.createPasswordResetToken(request.email());
             User user = identityService.findByEmail(request.email());
+            String name = user.getHuman() != null ? user.getHuman().getName() : "Usuário";
+            
+            if (request.novaSenha() != null && !request.novaSenha().isBlank()) {
+                identityService.resetPasswordWithToken(resetToken, request.novaSenha());
+            } else {
+                emailService.sendPasswordResetEmail(user.getEmail(), name, resetToken);
+            }
+
             audit(user.getId(), "PASSWORD_CHANGED", user.getId().toString(), "SUCCESS", httpRequest, null);
             return ResponseEntity.ok().build();
         } catch (IllegalArgumentException e) {
