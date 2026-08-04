@@ -1,6 +1,7 @@
 package br.ufpb.dsc.nexushub.model.privacy.service;
 import br.ufpb.dsc.nexushub.model.identity.domain.User;
 import br.ufpb.dsc.nexushub.model.identity.repository.UserRepository;
+import br.ufpb.dsc.nexushub.model.people.domain.Human;
 import br.ufpb.dsc.nexushub.model.privacy.domain.*;
 import br.ufpb.dsc.nexushub.model.privacy.repository.*;
 import java.util.*;
@@ -15,8 +16,31 @@ public class PrivacyService {
  @Transactional(readOnly=true) public Map<String,Object> export(UUID userId){
   User user=requireUser(userId);
   Map<String,Object> data=new LinkedHashMap<>();
-  data.put("id",user.getId());data.put("name",user.getHuman().getName());data.put("email",user.getEmail());
-  data.put("role",user.getRole().getName());data.put("consents",consents.findByUserIdOrderByCreatedAtDesc(userId));
+  data.put("id",user.getId());
+  data.put("email",user.getEmail());
+  data.put("role",user.getRole().getName());
+  Human human=user.getHuman();
+  if(human != null){
+   Map<String,Object> profile=new LinkedHashMap<>();
+   profile.put("name",human.getName());
+   profile.put("username",human.getUsername());
+   profile.put("bio",human.getBio());
+   profile.put("course",human.getCourse());
+   profile.put("period",human.getPeriod());
+   profile.put("matricula",human.getMatricula());
+   profile.put("userType",human.getUserType());
+   profile.put("birthDate",human.getBirthDate());
+   profile.put("whatsapp",human.getWhatsapp());
+   profile.put("githubUrl",human.getGithubUrl());
+   profile.put("linkedinUrl",human.getLinkedinUrl());
+   profile.put("websiteUrl",human.getWebsiteUrl());
+   profile.put("experience",human.getExperience());
+   profile.put("education",human.getEducation());
+   profile.put("certification",human.getCertification());
+   data.put("profile",profile);
+   data.put("name",human.getName());
+  }
+  data.put("consents",consents.findByUserIdOrderByCreatedAtDesc(userId));
   data.put("requests",requests.findByUserIdOrderByCreatedAtDesc(userId));
   return data;
  }

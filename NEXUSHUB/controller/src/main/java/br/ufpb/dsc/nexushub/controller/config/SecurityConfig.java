@@ -38,7 +38,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, RateLimitingFilter rateLimitingFilter) throws Exception {
         var csrfRequestHandler = new CsrfTokenRequestAttributeHandler();
         csrfRequestHandler.setCsrfRequestAttributeName(null);
 
@@ -47,6 +47,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                     .csrfTokenRequestHandler(csrfRequestHandler)
                     .ignoringRequestMatchers("/api/pagamentos/webhook", "/api/usuarios/login", "/api/usuarios/cadastro", "/api/usuarios/login-google"))
+            .addFilterBefore(rateLimitingFilter, BasicAuthenticationFilter.class)
             .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
             .headers(headers -> headers
                     .contentTypeOptions(Customizer.withDefaults())
@@ -55,7 +56,7 @@ public class SecurityConfig {
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 .requestMatchers("/*.js", "/*.css", "/*.ico", "/*.png", "/*.svg",
                         "/*.woff", "/*.woff2", "/*.map", "/assets/**").permitAll()
-                .requestMatchers("/", "/index.html", "/ping", "/actuator/health", "/health", "/api/health", "/api/usuarios/sessao",
+                .requestMatchers("/", "/index.html", "/ping", "/actuator/health", "/actuator/prometheus", "/health", "/api/health", "/api/usuarios/sessao",
                         "/api/usuarios/login", "/api/usuarios/cadastro", "/api/usuarios/login-google", "/api/pagamentos/webhook",
                         "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                 .requestMatchers("/login", "/cadastro", "/esqueci-senha", "/perfil",
